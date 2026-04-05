@@ -1,0 +1,62 @@
+# Configuration for ASCII art conversion methods
+#
+# Each method configuration should include:
+# - name: unique identifier for the method
+# - method: the method function to use (from methods.py)
+# - scale: scale factor for resizing input images
+# - misc_args: dictionary of additional arguments specific to the method
+
+methods:
+  - name: "greedy_iou_p30"
+    method: "greedy_iou"
+    scale: 0.5
+    misc_args:
+      percentile: 30
+      char_set: "extended"
+      char_width: 8
+      char_height: 16
+
+  - name: "greedy_iou_p50"
+    method: "greedy_iou"
+    scale: 0.5
+    misc_args:
+      percentile: 50
+      char_set: "extended"
+      char_width: 8
+      char_height: 16
+
+  - name: "greedy_iou_p70"
+    method: "greedy_iou"
+    scale: 0.5
+    misc_args:
+      percentile: 70
+      char_set: "extended"
+      char_width: 8
+      char_height: 16
+
+  - name: "greedy_iou_minimal_p50"
+    method: "greedy_iou"
+    scale: 0.5
+    misc_args:
+      percentile: 50
+      char_set: "minimal"
+      char_width: 8
+      char_height: 16
+
+  - name: "greedy_iou_standard_p50"
+    method: "greedy_iou"
+    scale: 0.5
+    misc_args:
+      percentile: 50
+      char_set: "standard"
+      char_width: 8
+      char_height: 16
+
+  - name: "greedy_iou_all_p50"
+    method: "greedy_iou"
+    scale: 0.5
+    misc_args:
+      percentile: 50
+      char_set: "all"
+      char_width: 8
+      char_height: 16
