@@ -14,4 +14,4 @@ the methods to evaluate should be listed in a yaml file wil misc_args filled in 
 
 Evaluation: this pipeline should save out a left-to-right concatenated rgb image post center-crop, the greyscale, the thresholded, and the ascii render. Make sure a vertical red bar of 2 pixel width separates each image before concatenation. Output folder should be split by method, in each method, a list of concated pngs should be there.
 
-Make a readme that is very very minimal. it should say how to set up the python .venv, and install needed dependencies. then list the main .py files to run. namely a python incantation example to run a specific method, and a python incantation to run the full evaluation pipeline. 
+Make a readme that is very very minimal. it should say how to set up the python .venv, and install needed dependencies. All dependencies should be in the venv. then list the main .py files to run. namely a python incantation example to run a specific method, and a python incantation to run the full evaluation pipeline. 
