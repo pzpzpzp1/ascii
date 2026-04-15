@@ -4,12 +4,44 @@ Evaluation pipeline for ASCII art conversion methods.
 This script runs all configured methods on all test images and generates
 comprehensive visualizations showing each stage of the conversion process.
 """
+import json
 import os
 import glob
 import yaml
 import numpy as np
 from PIL import Image
 from ascii_image import AsciiImage
+
+_IMAGE_CONFIG_DEFAULTS = {'scale': 1.0, 'percentile': 50}
+
+
+def _get_image_config(img_path: str) -> dict:
+    """
+    Read per-image config from a sidecar .json file next to the image.
+    Creates the file with defaults if missing. Returns dict with 'scale' and 'percentile'.
+    """
+    base = os.path.splitext(img_path)[0]
+    json_path = base + '.json'
+    if not os.path.exists(json_path):
+        with open(json_path, 'w') as f:
+            json.dump(_IMAGE_CONFIG_DEFAULTS, f, indent=2)
+        return dict(_IMAGE_CONFIG_DEFAULTS)
+    with open(json_path, 'r') as f:
+        data = json.load(f)
+    for k, v in _IMAGE_CONFIG_DEFAULTS.items():
+        data.setdefault(k, v)
+    return data
+
+
+def _open_rgb(path: str) -> Image.Image:
+    """Open an image and composite any alpha channel onto white before returning RGB."""
+    img = Image.open(path)
+    if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
+        img = img.convert('RGBA')
+        bg = Image.new('RGB', img.size, (255, 255, 255))
+        bg.paste(img, mask=img.split()[3])
+        return bg
+    return img.convert('RGB')
 
 
 def create_visualization(img_path: str, method_name: str, method_func: str,
@@ -28,7 +60,12 @@ def create_visualization(img_path: str, method_name: str, method_func: str,
         misc_args: Additional method arguments
         output_dir: Directory to save output
     """
-    img = Image.open(img_path).convert('RGB')
+    img = _open_rgb(img_path)
+
+    img_config = _get_image_config(img_path)
+    scale = scale * img_config['scale']
+    percentile = img_config['percentile']
+    misc_args = {**misc_args, 'percentile': percentile}
 
     # Scale the full image (no cropping)
     scaled = img.resize(
@@ -40,7 +77,6 @@ def create_visualization(img_path: str, method_name: str, method_func: str,
     gray_rgb = gray_img.convert('RGB')
 
     gray_array = np.array(gray_img)
-    percentile = misc_args.get('percentile', 50)
     interesting = gray_array[(gray_array > 0) & (gray_array < 255)]
     threshold = np.percentile(interesting, percentile) if interesting.size > 0 else 128
     binary_array = (gray_array < threshold).astype(np.uint8) * 255
