@@ -7,6 +7,7 @@ comprehensive visualizations showing each stage of the conversion process.
 import json
 import os
 import glob
+import cv2
 import yaml
 import numpy as np
 from PIL import Image
@@ -74,13 +75,17 @@ def create_visualization(img_path: str, method_name: str, method_func: str,
     )
 
     gray_img = scaled.convert('L')
-    gray_rgb = gray_img.convert('RGB')
-
     gray_array = np.array(gray_img)
+
+    # Panel 2: threshold
     interesting = gray_array[(gray_array > 0) & (gray_array < 255)]
     threshold = np.percentile(interesting, percentile) if interesting.size > 0 else 128
     binary_array = (gray_array < threshold).astype(np.uint8) * 255
     threshold_img = Image.fromarray(binary_array).convert('RGB')
+
+    # Panel 3: canny edges
+    edges = cv2.Canny(gray_array, threshold1=50, threshold2=150)
+    canny_img = Image.fromarray(edges).convert('RGB')
 
     ascii_img = AsciiImage.from_image(img, scale, method_func, **misc_args)
     temp_ascii_path = os.path.join(output_dir, 'temp_ascii.png')
@@ -94,13 +99,13 @@ def create_visualization(img_path: str, method_name: str, method_func: str,
         return src.resize((new_w, target_h), Image.Resampling.LANCZOS)
 
     scaled        = resize_to_height(scaled,        target_height)
-    gray_rgb      = resize_to_height(gray_rgb,      target_height)
     threshold_img = resize_to_height(threshold_img, target_height)
+    canny_img     = resize_to_height(canny_img,     target_height)
     ascii_render  = resize_to_height(ascii_render,  target_height)
 
     separator = Image.new('RGB', (2, target_height), color=(255, 0, 0))
 
-    panels = [scaled, separator, gray_rgb, separator, threshold_img, separator, ascii_render]
+    panels = [scaled, separator, threshold_img, separator, canny_img, separator, ascii_render]
     total_width = sum(p.size[0] for p in panels)
 
     concatenated = Image.new('RGB', (total_width, target_height))

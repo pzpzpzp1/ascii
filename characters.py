@@ -88,10 +88,17 @@ def get_character_set(mode='extended'):
     Returns:
         str: String containing all valid characters for the mode
     """
+    import os
+    ext_path = os.path.join(os.path.dirname(__file__), 'characters', 'extended.txt')
+    try:
+        with open(ext_path, 'r', encoding='utf-8') as f:
+            extended = f.read()
+    except FileNotFoundError:
+        extended = EXTENDED_SET
+
     modes = {
-        'minimal': MINIMAL_SET,
         'standard': STANDARD_ASCII,
-        'extended': EXTENDED_SET,
+        'extended': extended,
         'all': ALL_CHARACTERS
     }
 

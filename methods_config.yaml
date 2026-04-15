@@ -10,14 +10,6 @@ methods:
       char_width: 8
       char_height: 16
 
-  - name: "greedy_iou_minimal"
-    method: "greedy_iou"
-    scale: 0.5
-    misc_args:
-      char_set: "minimal"
-      char_width: 8
-      char_height: 16
-
   - name: "greedy_iou_standard"
     method: "greedy_iou"
     scale: 0.5

@@ -1,6 +1,7 @@
 """
 ASCII art conversion methods and utilities.
 """
+import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import os
@@ -132,20 +133,10 @@ def greedy_iou_method(img: Image.Image, scale: float, percentile: float = 50,
     new_height = int(img.size[1] * scale)
     img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
-    # Step 3: Convert to grayscale
-    gray_img = img.convert('L')
-    gray_array = np.array(gray_img)
-
-    # Step 4: Calculate threshold based on percentile, ignoring pure black/white
-    interesting = gray_array[(gray_array > 0) & (gray_array < 255)]
-    if interesting.size > 0:
-        threshold = np.percentile(interesting, percentile)
-    else:
-        # Entire image is pure black/white — skip filtering
-        threshold = 128
-    binary_img = (gray_array < threshold).astype(np.uint8)
-
-    # Step 5: Create binary image
+    # Convert to grayscale then Canny edges → binary image for IOU matching
+    gray_array = np.array(img.convert('L'))
+    edges = cv2.Canny(gray_array, threshold1=50, threshold2=150)
+    binary_img = (edges > 0).astype(np.uint8)
 
     # Step 6: Calculate grid dimensions
     grid_height = new_height // char_height
