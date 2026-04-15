@@ -34,51 +34,47 @@ class AsciiImage:
             bg_color: Background color tuple (R, G, B)
             text_color: Text color tuple (R, G, B)
         """
-        # Try to load a monospace font, fall back to default if unavailable
-        try:
-            # Common monospace font paths
-            font_paths = [
-                "/System/Library/Fonts/Courier.dfont",  # macOS
-                "/Library/Fonts/Courier New.ttf",  # macOS
-                "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",  # Linux
-                "C:\\Windows\\Fonts\\consola.ttf",  # Windows
-                "C:\\Windows\\Fonts\\cour.ttf",  # Windows
-            ]
-
-            font = None
-            for font_path in font_paths:
-                if os.path.exists(font_path):
-                    font = ImageFont.truetype(font_path, font_size)
+        # Load a monospace font — prefer VSCode-style fonts
+        font_paths = [
+            "/System/Library/Fonts/Menlo.ttc",                          # macOS (VSCode default)
+            "/Library/Fonts/Courier New.ttf",                           # macOS
+            "/System/Library/Fonts/Courier.dfont",                      # macOS fallback
+            "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",      # Linux
+            "C:\\Windows\\Fonts\\consola.ttf",                          # Windows (Consolas)
+            "C:\\Windows\\Fonts\\cour.ttf",                             # Windows
+        ]
+        font = None
+        for path in font_paths:
+            if os.path.exists(path):
+                try:
+                    font = ImageFont.truetype(path, font_size)
                     break
-
-            if font is None:
-                font = ImageFont.load_default()
-        except Exception:
+                except Exception:
+                    continue
+        if font is None:
             font = ImageFont.load_default()
 
-        # Calculate character dimensions
-        # Use a test character to determine size
-        test_img = Image.new('RGB', (100, 100))
-        test_draw = ImageDraw.Draw(test_img)
-        bbox = test_draw.textbbox((0, 0), 'M', font=font)
-        char_width = bbox[2] - bbox[0]
-        char_height = bbox[3] - bbox[1]
+        # Fixed cell dimensions: every character occupies exactly cell_w × cell_h pixels,
+        # mirroring how a monospace .txt file looks in VSCode.
+        ascent, descent = font.getmetrics()
+        cell_h = ascent + descent  # already an integer for TrueType fonts
 
-        # Create image with appropriate size
-        img_width = self.width * char_width
-        img_height = self.height * char_height
-        image = Image.new('RGB', (img_width, img_height), color=bg_color)
+        tmp = Image.new('L', (1, 1))
+        cell_w = int(round(ImageDraw.Draw(tmp).textlength('M', font=font)))
+
+        image = Image.new('RGB', (self.width * cell_w, self.height * cell_h), color=bg_color)
         draw = ImageDraw.Draw(image)
 
-        # Draw each character
-        for y in range(self.height):
-            for x in range(self.width):
-                char = self.char_array[y, x]
-                pos_x = x * char_width
-                pos_y = y * char_height
-                draw.text((pos_x, pos_y), char, fill=text_color, font=font)
+        # Render each character into a cell-sized scratch image first, then paste.
+        # This clips wide glyphs (e.g. katakana) that would otherwise bleed into
+        # the neighbouring cell if drawn directly onto the full image.
+        for row_idx in range(self.height):
+            for col_idx in range(self.width):
+                ch = self.char_array[row_idx, col_idx]
+                cell_img = Image.new('RGB', (cell_w, cell_h), color=bg_color)
+                ImageDraw.Draw(cell_img).text((0, 0), ch, fill=text_color, font=font)
+                image.paste(cell_img, (col_idx * cell_w, row_idx * cell_h))
 
-        # Save the image
         os.makedirs(os.path.dirname(outname) if os.path.dirname(outname) else '.', exist_ok=True)
         image.save(outname)
 

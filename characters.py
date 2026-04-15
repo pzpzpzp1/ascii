@@ -42,7 +42,22 @@ ASCII_DARKEST = "MWB8%&#@"
 BOX_DRAWING = "─│┌┐└┘├┤┬┴┼"
 
 # Block elements (gradient shading)
-BLOCKS = "░▒▓█▀▄▌▐"
+# █ (U+2588 FULL BLOCK) is intentionally excluded — fully-occupied cells are visually
+# boring and indistinguishable from each other, so they add no information.
+BLOCKS = "░▒▓▀▄▌▐"
+
+# Characters that must never be used as candidates regardless of character set.
+# Managed via characters/blacklist.txt — one file, edit to add/remove entries.
+def _load_blacklist() -> frozenset:
+    import os
+    path = os.path.join(os.path.dirname(__file__), 'characters', 'blacklist.txt')
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            return frozenset(f.read())
+    except FileNotFoundError:
+        return frozenset()
+
+NEVER_USE = _load_blacklist()
 
 # Special symbols
 SYMBOLS = "•◦○●◘◙"
@@ -96,7 +111,7 @@ def get_character_list(mode='extended'):
     Returns:
         list: List of individual character strings
     """
-    return list(get_character_set(mode))
+    return [c for c in get_character_set(mode) if c not in NEVER_USE]
 
 
 def process_character_dumps():

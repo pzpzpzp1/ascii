@@ -60,36 +60,28 @@ def render_character_to_array(char: str, width: int, height: int, font_size: int
     img = Image.new('L', (width, height), color=255)
     draw = ImageDraw.Draw(img)
 
-    # Try to load a monospace font
-    try:
-        font_paths = [
-            "/System/Library/Fonts/Courier.dfont",
-            "/Library/Fonts/Courier New.ttf",
-            "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
-            "C:\\Windows\\Fonts\\consola.ttf",
-            "C:\\Windows\\Fonts\\cour.ttf",
-        ]
-
-        font = None
-        for font_path in font_paths:
-            if os.path.exists(font_path):
-                font = ImageFont.truetype(font_path, font_size)
+    # Load the same monospace font as save() for consistent matching
+    font_paths = [
+        "/System/Library/Fonts/Menlo.ttc",
+        "/Library/Fonts/Courier New.ttf",
+        "/System/Library/Fonts/Courier.dfont",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+        "C:\\Windows\\Fonts\\consola.ttf",
+        "C:\\Windows\\Fonts\\cour.ttf",
+    ]
+    font = None
+    for path in font_paths:
+        if os.path.exists(path):
+            try:
+                font = ImageFont.truetype(path, font_size)
                 break
-
-        if font is None:
-            font = ImageFont.load_default()
-    except Exception:
+            except Exception:
+                continue
+    if font is None:
         font = ImageFont.load_default()
 
-    # Draw character centered
-    bbox = draw.textbbox((0, 0), char, font=font)
-    char_width = bbox[2] - bbox[0]
-    char_height = bbox[3] - bbox[1]
-
-    x = (width - char_width) // 2
-    y = (height - char_height) // 2
-
-    draw.text((x, y), char, fill=0, font=font)
+    # Draw at natural top-left anchor — matches how save() positions each character
+    draw.text((0, 0), char, fill=0, font=font)
 
     # Convert to numpy array and threshold
     arr = np.array(img)
@@ -113,7 +105,7 @@ def calculate_iou(arr1: np.ndarray, arr2: np.ndarray) -> float:
     union = np.logical_or(arr1, arr2).sum()
 
     if union == 0:
-        return 0.0
+        return 1.0  # both arrays empty — perfect match (space character)
 
     return intersection / union
 
@@ -135,11 +127,7 @@ def greedy_iou_method(img: Image.Image, scale: float, percentile: float = 50,
     Returns:
         2D numpy array of characters
     """
-    # Step 1: Center crop to appropriate aspect ratio
-    char_aspect = char_width / char_height
-    img = center_crop_to_ascii_ratio(img, char_aspect_ratio=char_aspect)
-
-    # Step 2: Resize image based on scale
+    # Step 1: Resize image based on scale
     new_width = int(img.size[0] * scale)
     new_height = int(img.size[1] * scale)
     img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
@@ -148,11 +136,16 @@ def greedy_iou_method(img: Image.Image, scale: float, percentile: float = 50,
     gray_img = img.convert('L')
     gray_array = np.array(gray_img)
 
-    # Step 4: Calculate threshold based on percentile
-    threshold = np.percentile(gray_array, percentile)
+    # Step 4: Calculate threshold based on percentile, ignoring pure black/white
+    interesting = gray_array[(gray_array > 0) & (gray_array < 255)]
+    if interesting.size > 0:
+        threshold = np.percentile(interesting, percentile)
+    else:
+        # Entire image is pure black/white — skip filtering
+        threshold = 128
+    binary_img = (gray_array < threshold).astype(np.uint8)
 
     # Step 5: Create binary image
-    binary_img = (gray_array < threshold).astype(np.uint8)
 
     # Step 6: Calculate grid dimensions
     grid_height = new_height // char_height

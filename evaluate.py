@@ -10,13 +10,15 @@ import yaml
 import numpy as np
 from PIL import Image
 from ascii_image import AsciiImage
-from methods import center_crop_to_ascii_ratio
 
 
 def create_visualization(img_path: str, method_name: str, method_func: str,
                          scale: float, misc_args: dict, output_dir: str):
     """
     Create a visualization showing all stages of ASCII conversion.
+
+    Panels (left to right): original | grayscale | threshold | ASCII render
+    All panels use the full image at the given scale, preserving aspect ratio.
 
     Args:
         img_path: Path to input image
@@ -26,70 +28,59 @@ def create_visualization(img_path: str, method_name: str, method_func: str,
         misc_args: Additional method arguments
         output_dir: Directory to save output
     """
-    # Load image
     img = Image.open(img_path).convert('RGB')
 
-    # Step 1: Center crop
-    char_aspect = misc_args.get('char_width', 8) / misc_args.get('char_height', 16)
-    cropped_img = center_crop_to_ascii_ratio(img, char_aspect_ratio=char_aspect)
+    # Scale the full image (no cropping)
+    scaled = img.resize(
+        (int(img.size[0] * scale), int(img.size[1] * scale)),
+        Image.Resampling.LANCZOS
+    )
 
-    # Resize for visualization consistency
-    new_width = int(cropped_img.size[0] * scale)
-    new_height = int(cropped_img.size[1] * scale)
-    cropped_resized = cropped_img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+    gray_img = scaled.convert('L')
+    gray_rgb = gray_img.convert('RGB')
 
-    # Step 2: Grayscale
-    gray_img = cropped_resized.convert('L')
-    gray_rgb = gray_img.convert('RGB')  # Convert back to RGB for concatenation
-
-    # Step 3: Thresholded image
     gray_array = np.array(gray_img)
     percentile = misc_args.get('percentile', 50)
-    threshold = np.percentile(gray_array, percentile)
+    interesting = gray_array[(gray_array > 0) & (gray_array < 255)]
+    threshold = np.percentile(interesting, percentile) if interesting.size > 0 else 128
     binary_array = (gray_array < threshold).astype(np.uint8) * 255
     threshold_img = Image.fromarray(binary_array).convert('RGB')
 
-    # Step 4: Generate ASCII art
     ascii_img = AsciiImage.from_image(img, scale, method_func, **misc_args)
-
-    # Save ASCII render
     temp_ascii_path = os.path.join(output_dir, 'temp_ascii.png')
     ascii_img.save(temp_ascii_path, font_size=12)
-
-    # Load the rendered ASCII image
     ascii_render = Image.open(temp_ascii_path).convert('RGB')
 
-    # Resize all images to same height for concatenation
-    target_height = cropped_resized.size[1]
+    target_height = scaled.size[1]
 
-    def resize_to_height(img, target_h):
-        aspect = img.size[0] / img.size[1]
-        new_w = int(target_h * aspect)
-        return img.resize((new_w, target_h), Image.Resampling.LANCZOS)
+    def resize_to_height(src, target_h):
+        new_w = int(target_h * src.size[0] / src.size[1])
+        return src.resize((new_w, target_h), Image.Resampling.LANCZOS)
 
-    cropped_resized = resize_to_height(cropped_resized, target_height)
-    gray_rgb = resize_to_height(gray_rgb, target_height)
+    scaled        = resize_to_height(scaled,        target_height)
+    gray_rgb      = resize_to_height(gray_rgb,      target_height)
     threshold_img = resize_to_height(threshold_img, target_height)
-    ascii_render = resize_to_height(ascii_render, target_height)
+    ascii_render  = resize_to_height(ascii_render,  target_height)
 
-    # Create red separator bar (2 pixels wide)
-    separator_width = 2
-    separator = Image.new('RGB', (separator_width, target_height), color=(255, 0, 0))
+    separator = Image.new('RGB', (2, target_height), color=(255, 0, 0))
 
-    # Concatenate images horizontally with red separators
-    images = [cropped_resized, separator, gray_rgb, separator, threshold_img, separator, ascii_render]
-    total_width = sum(img.size[0] for img in images)
+    panels = [scaled, separator, gray_rgb, separator, threshold_img, separator, ascii_render]
+    total_width = sum(p.size[0] for p in panels)
 
     concatenated = Image.new('RGB', (total_width, target_height))
     x_offset = 0
-    for img in images:
-        concatenated.paste(img, (x_offset, 0))
-        x_offset += img.size[0]
+    for panel in panels:
+        concatenated.paste(panel, (x_offset, 0))
+        x_offset += panel.size[0]
 
     # Save the concatenated result
     img_basename = os.path.splitext(os.path.basename(img_path))[0]
     output_path = os.path.join(output_dir, f'{img_basename}_visualization.png')
     concatenated.save(output_path)
+
+    # Save ASCII as text file
+    txt_path = os.path.join(output_dir, f'{img_basename}_visualization.txt')
+    ascii_img.to_text_file(txt_path)
 
     # Clean up temp file
     if os.path.exists(temp_ascii_path):
