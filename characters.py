@@ -90,11 +90,22 @@ def get_character_set(mode='extended'):
     """
     import os
 
+    def _unique_chars(text):
+        seen = set()
+        unique = []
+        for ch in text:
+            if ch in '\n\r\t':
+                continue
+            if ch not in seen:
+                seen.add(ch)
+                unique.append(ch)
+        return ''.join(unique)
+
     def _load_file_set(filename):
         path = os.path.join(os.path.dirname(__file__), 'characters', filename)
         try:
             with open(path, 'r', encoding='utf-8') as f:
-                return f.read()
+                return _unique_chars(f.read())
         except FileNotFoundError:
             return ''
 
@@ -108,7 +119,7 @@ def get_character_set(mode='extended'):
     if mode not in modes:
         raise ValueError(f"Invalid mode '{mode}'. Choose from: {list(modes.keys())}")
 
-    return modes[mode]
+    return _unique_chars(modes[mode])
 
 
 def get_character_list(mode='extended'):

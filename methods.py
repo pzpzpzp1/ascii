@@ -94,13 +94,6 @@ def render_character_to_array(char: str, width: int, height: int, font_size: int
 def calculate_iou(arr1: np.ndarray, arr2: np.ndarray) -> float:
     """
     Calculate Intersection over Union between two binary arrays.
-
-    Args:
-        arr1: First binary array
-        arr2: Second binary array
-
-    Returns:
-        IOU score (0 to 1)
     """
     intersection = np.logical_and(arr1, arr2).sum()
     union = np.logical_or(arr1, arr2).sum()
@@ -109,6 +102,23 @@ def calculate_iou(arr1: np.ndarray, arr2: np.ndarray) -> float:
         return 1.0  # both arrays empty — perfect match (space character)
 
     return intersection / union
+
+
+def calculate_white_weighted_iou(arr1: np.ndarray, arr2: np.ndarray, white_weight: float = 2.0) -> float:
+    """
+    IOU variant that upweights white-pixel matches.
+    Formula: (intersection + w * both_white) / (intersection + w * both_white + mismatch)
+    """
+    intersection = np.logical_and(arr1, arr2).sum()
+    union = np.logical_or(arr1, arr2).sum()
+    both_white = arr1.size - union
+    mismatch = union - intersection
+
+    denom = intersection + white_weight * both_white + mismatch
+    if denom == 0:
+        return 1.0
+
+    return (intersection + white_weight * both_white) / denom
 
 
 def greedy_iou_method(img: Image.Image, scale: float, percentile: float = 50,
@@ -133,10 +143,10 @@ def greedy_iou_method(img: Image.Image, scale: float, percentile: float = 50,
     new_height = int(img.size[1] * scale)
     img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
-    # Convert to grayscale then Canny edges → binary image for IOU matching
     gray_array = np.array(img.convert('L'))
-    edges = cv2.Canny(gray_array, threshold1=50, threshold2=150)
-    binary_img = (edges > 0).astype(np.uint8)
+    interesting = gray_array[(gray_array > 0) & (gray_array < 255)]
+    threshold = np.percentile(interesting, percentile) if interesting.size > 0 else 128
+    binary_img = (gray_array < threshold).astype(np.uint8)
 
     # Step 6: Calculate grid dimensions
     grid_height = new_height // char_height
@@ -182,9 +192,59 @@ def greedy_iou_method(img: Image.Image, scale: float, percentile: float = 50,
     return result
 
 
+def greedy_iou_white_weighted_method(img: Image.Image, scale: float, percentile: float = 50,
+                                     char_set: str = 'insta', char_width: int = 8,
+                                     char_height: int = 16, white_weight: float = 2.0) -> np.ndarray:
+    """
+    Greedy IOU matching with white-pixel upweighting.
+    White pixel matches count white_weight times more than black matches.
+    """
+    new_width = int(img.size[0] * scale)
+    new_height = int(img.size[1] * scale)
+    img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+    gray_array = np.array(img.convert('L'))
+    interesting = gray_array[(gray_array > 0) & (gray_array < 255)]
+    threshold = np.percentile(interesting, percentile) if interesting.size > 0 else 128
+    binary_img = (gray_array < threshold).astype(np.uint8)
+
+    grid_height = new_height // char_height
+    grid_width = new_width // char_width
+
+    char_list = characters.get_character_list(char_set)
+    char_renders = {char: render_character_to_array(char, char_width, char_height)
+                    for char in char_list}
+
+    result = np.empty((grid_height, grid_width), dtype=object)
+
+    for y in range(grid_height):
+        for x in range(grid_width):
+            y_start, y_end = y * char_height, min((y + 1) * char_height, new_height)
+            x_start, x_end = x * char_width, min((x + 1) * char_width, new_width)
+            patch = binary_img[y_start:y_end, x_start:x_end]
+
+            if patch.shape != (char_height, char_width):
+                patch_img = Image.fromarray((patch * 255).astype(np.uint8))
+                patch_img = patch_img.resize((char_width, char_height), Image.Resampling.NEAREST)
+                patch = (np.array(patch_img) > 128).astype(np.uint8)
+
+            best_char = ' '
+            best_score = -1
+            for char, char_render in char_renders.items():
+                score = calculate_white_weighted_iou(patch, char_render, white_weight)
+                if score > best_score:
+                    best_score = score
+                    best_char = char
+
+            result[y, x] = best_char
+
+    return result
+
+
 # Registry of available methods
 METHODS = {
     'greedy_iou': greedy_iou_method,
+    'greedy_iou_white_weighted': greedy_iou_white_weighted_method,
 }
 
 
