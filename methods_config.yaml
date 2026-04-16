@@ -25,3 +25,11 @@ methods:
       char_set: "all"
       char_width: 8
       char_height: 16
+
+  - name: "greedy_iou_insta"
+    method: "greedy_iou"
+    scale: 0.5
+    misc_args:
+      char_set: "insta"
+      char_width: 8
+      char_height: 16

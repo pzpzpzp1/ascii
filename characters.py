@@ -89,17 +89,20 @@ def get_character_set(mode='extended'):
         str: String containing all valid characters for the mode
     """
     import os
-    ext_path = os.path.join(os.path.dirname(__file__), 'characters', 'extended.txt')
-    try:
-        with open(ext_path, 'r', encoding='utf-8') as f:
-            extended = f.read()
-    except FileNotFoundError:
-        extended = EXTENDED_SET
+
+    def _load_file_set(filename):
+        path = os.path.join(os.path.dirname(__file__), 'characters', filename)
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                return f.read()
+        except FileNotFoundError:
+            return ''
 
     modes = {
         'standard': STANDARD_ASCII,
-        'extended': extended,
-        'all': ALL_CHARACTERS
+        'extended': _load_file_set('extended.txt') or EXTENDED_SET,
+        'insta':    _load_file_set('insta.txt'),
+        'all':      ALL_CHARACTERS,
     }
 
     if mode not in modes:
