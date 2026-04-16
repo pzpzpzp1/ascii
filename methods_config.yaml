@@ -26,22 +26,32 @@ methods:
 #      char_width: 8
 #      char_height: 16
 
-  - name: "greedy_iou_insta"
-    method: "greedy_iou"
-    scale: 0.5
-    misc_args:
-      char_set: "insta"
-      char_width: 8
-      char_height: 16
-
-  - name: "greedy_iou_insta_bw2"
+  - name: "greedy_iou_insta_ww0"
     method: "greedy_iou_white_weighted"
     scale: 0.5
     misc_args:
       char_set: "insta"
       char_width: 8
       char_height: 16
-      white_weight: 2
+      white_weight: 0
+
+#  - name: "greedy_iou_insta_ww1"
+#    method: "greedy_iou_white_weighted"
+#    scale: 0.5
+#    misc_args:
+#      char_set: "insta"
+#      char_width: 8
+#      char_height: 16
+#      white_weight: 1
+
+#  - name: "greedy_iou_insta_ww2"
+#    method: "greedy_iou_white_weighted"
+#    scale: 0.5
+#    misc_args:
+#      char_set: "insta"
+#      char_width: 8
+#      char_height: 16
+#      white_weight: 2
 
   - name: "greedy_iou_insta_ww3"
     method: "greedy_iou_white_weighted"
@@ -52,20 +62,74 @@ methods:
       char_height: 16
       white_weight: 3
 
-  - name: "greedy_iou_insta_ww4"
+  - name: "greedy_iou_insta2_ww0"
     method: "greedy_iou_white_weighted"
     scale: 0.5
     misc_args:
-      char_set: "insta"
+      char_set: "insta2"
       char_width: 8
       char_height: 16
-      white_weight: 4
+      white_weight: 0
 
-  - name: "greedy_iou_insta_ww5"
+#  - name: "greedy_iou_insta2_ww1"
+#    method: "greedy_iou_white_weighted"
+#    scale: 0.5
+#    misc_args:
+#      char_set: "insta2"
+#      char_width: 8
+#      char_height: 16
+#      white_weight: 1
+
+#  - name: "greedy_iou_insta2_ww2"
+#    method: "greedy_iou_white_weighted"
+#    scale: 0.5
+#    misc_args:
+#      char_set: "insta2"
+#      char_width: 8
+#      char_height: 16
+#      white_weight: 2
+
+  - name: "greedy_iou_insta2_ww3"
     method: "greedy_iou_white_weighted"
     scale: 0.5
     misc_args:
-      char_set: "insta"
+      char_set: "insta2"
       char_width: 8
       char_height: 16
-      white_weight: 5
+      white_weight: 3
+
+  - name: "greedy_iou_extended_ww0"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "extended"
+      char_width: 8
+      char_height: 16
+      white_weight: 0
+
+#  - name: "greedy_iou_extended_ww1"
+#    method: "greedy_iou_white_weighted"
+#    scale: 0.5
+#    misc_args:
+#      char_set: "extended"
+#      char_width: 8
+#      char_height: 16
+#      white_weight: 1
+
+#  - name: "greedy_iou_extended_ww2"
+#    method: "greedy_iou_white_weighted"
+#    scale: 0.5
+#    misc_args:
+#      char_set: "extended"
+#      char_width: 8
+#      char_height: 16
+#      white_weight: 2
+
+  - name: "greedy_iou_extended_ww3"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "extended"
+      char_width: 8
+      char_height: 16
+      white_weight: 3

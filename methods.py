@@ -106,19 +106,19 @@ def calculate_iou(arr1: np.ndarray, arr2: np.ndarray) -> float:
 
 def calculate_white_weighted_iou(arr1: np.ndarray, arr2: np.ndarray, white_weight: float = 2.0) -> float:
     """
-    IOU variant that upweights white-pixel matches.
-    Formula: (intersection + w * both_white) / (intersection + w * both_white + mismatch)
+    Convex blend of standard IOU (black matching) and white-pixel accuracy (white matching).
+    alpha = white_weight / (1 + white_weight), so higher white_weight shifts weight toward white accuracy.
+    score = (1 - alpha) * iou + alpha * white_acc
     """
     intersection = np.logical_and(arr1, arr2).sum()
     union = np.logical_or(arr1, arr2).sum()
     both_white = arr1.size - union
-    mismatch = union - intersection
 
-    denom = intersection + white_weight * both_white + mismatch
-    if denom == 0:
-        return 1.0
+    iou = (intersection / union) if union > 0 else 1.0
+    white_acc = both_white / arr1.size
 
-    return (intersection + white_weight * both_white) / denom
+    alpha = white_weight / (1.0 + white_weight)
+    return (1.0 - alpha) * iou + alpha * white_acc
 
 
 def greedy_iou_method(img: Image.Image, scale: float, percentile: float = 50,
