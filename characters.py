@@ -110,11 +110,12 @@ def get_character_set(mode='extended'):
             return ''
 
     modes = {
-        'standard': STANDARD_ASCII,
-        'extended': _load_file_set('extended.txt') or EXTENDED_SET,
-        'insta':    _load_file_set('insta.txt'),
-        'insta2':   _load_file_set('insta2.txt'),
-        'all':      ALL_CHARACTERS,
+        'standard':       STANDARD_ASCII,
+        'extended':       _load_file_set('extended.txt') or EXTENDED_SET,
+        'insta':          _load_file_set('insta.txt'),
+        'insta2':         _load_file_set('insta2.txt'),
+        'insta_tutorial': _load_file_set('insta_tutorial.txt'),
+        'all':            ALL_CHARACTERS,
     }
 
     if mode not in modes:
