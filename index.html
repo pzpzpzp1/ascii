@@ -1,252 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ASCII Art Gallery</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: #0d0d0d;
-      color: #e0e0e0;
-      font-family: 'Courier New', monospace;
-      min-height: 100vh;
-    }
-
-    header {
-      padding: 2rem;
-      border-bottom: 1px solid #222;
-    }
-
-    header h1 {
-      font-size: 1.4rem;
-      letter-spacing: 0.1em;
-      color: #fff;
-    }
-
-    header p {
-      font-size: 0.75rem;
-      color: #666;
-      margin-top: 0.3rem;
-    }
-
-    nav {
-      display: flex;
-      gap: 0.5rem;
-      padding: 1rem 2rem;
-      border-bottom: 1px solid #1a1a1a;
-      flex-wrap: wrap;
-    }
-
-    nav button {
-      background: #1a1a1a;
-      border: 1px solid #333;
-      color: #aaa;
-      padding: 0.4rem 1rem;
-      font-family: inherit;
-      font-size: 0.8rem;
-      cursor: pointer;
-      letter-spacing: 0.05em;
-      transition: all 0.15s;
-    }
-
-    nav button:hover, nav button.active {
-      background: #fff;
-      color: #000;
-      border-color: #fff;
-    }
-
-    main {
-      padding: 2rem;
-    }
-
-    .image-section {
-      display: none;
-    }
-
-    .image-section.active {
-      display: block;
-    }
-
-    .image-section h2 {
-      font-size: 1rem;
-      letter-spacing: 0.1em;
-      color: #fff;
-      margin-bottom: 1.5rem;
-      text-transform: uppercase;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .card {
-      background: #111;
-      border: 1px solid #222;
-      overflow: hidden;
-      cursor: pointer;
-      transition: border-color 0.15s;
-    }
-
-    .card:hover {
-      border-color: #555;
-    }
-
-    .card img {
-      width: 100%;
-      display: block;
-    }
-
-    .card-label {
-      padding: 0.6rem 0.8rem;
-      font-size: 0.7rem;
-      color: #666;
-      letter-spacing: 0.05em;
-      border-top: 1px solid #1a1a1a;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .card-label .charset {
-      color: #aaa;
-    }
-
-    .card-label .ww {
-      color: #555;
-    }
-
-    /* Lightbox */
-    #lightbox {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.95);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    #lightbox.open {
-      display: flex;
-    }
-
-    #lightbox img {
-      max-width: 95vw;
-      max-height: 95vh;
-      object-fit: contain;
-    }
-
-    #lightbox-label {
-      position: fixed;
-      bottom: 1.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.75rem;
-      color: #666;
-      letter-spacing: 0.1em;
-      pointer-events: none;
-    }
-  </style>
+<html>
+<head><meta charset="UTF-8"><title>output/</title>
+<style>body{font-family:monospace;padding:2rem}a{display:block}h2{margin:1.5rem 0 0.3rem}</style>
 </head>
 <body>
+<h1>output/</h1>
 
-<header>
-  <h1>ASCII Art Gallery</h1>
-  <p>greedy IOU &mdash; charset &times; white-weight comparison</p>
-</header>
+<h2>greedy_iou_extended_ww0/</h2>
+<a href="output/greedy_iou_extended_ww0/apple_visualization.png">apple_visualization.png</a>
+<a href="output/greedy_iou_extended_ww0/apple_visualization.txt">apple_visualization.txt</a>
+<a href="output/greedy_iou_extended_ww0/flandre_visualization.png">flandre_visualization.png</a>
+<a href="output/greedy_iou_extended_ww0/flandre_visualization.txt">flandre_visualization.txt</a>
+<a href="output/greedy_iou_extended_ww0/heracross_visualization.png">heracross_visualization.png</a>
+<a href="output/greedy_iou_extended_ww0/heracross_visualization.txt">heracross_visualization.txt</a>
+<a href="output/greedy_iou_extended_ww0/salmon_visualization.png">salmon_visualization.png</a>
+<a href="output/greedy_iou_extended_ww0/salmon_visualization.txt">salmon_visualization.txt</a>
 
-<nav id="nav"></nav>
+<h2>greedy_iou_extended_ww3/</h2>
+<a href="output/greedy_iou_extended_ww3/apple_visualization.png">apple_visualization.png</a>
+<a href="output/greedy_iou_extended_ww3/apple_visualization.txt">apple_visualization.txt</a>
+<a href="output/greedy_iou_extended_ww3/flandre_visualization.png">flandre_visualization.png</a>
+<a href="output/greedy_iou_extended_ww3/flandre_visualization.txt">flandre_visualization.txt</a>
+<a href="output/greedy_iou_extended_ww3/heracross_visualization.png">heracross_visualization.png</a>
+<a href="output/greedy_iou_extended_ww3/heracross_visualization.txt">heracross_visualization.txt</a>
+<a href="output/greedy_iou_extended_ww3/salmon_visualization.png">salmon_visualization.png</a>
+<a href="output/greedy_iou_extended_ww3/salmon_visualization.txt">salmon_visualization.txt</a>
 
-<main id="main"></main>
+<h2>greedy_iou_insta_tutorial_ww0/</h2>
+<a href="output/greedy_iou_insta_tutorial_ww0/apple_visualization.png">apple_visualization.png</a>
+<a href="output/greedy_iou_insta_tutorial_ww0/apple_visualization.txt">apple_visualization.txt</a>
+<a href="output/greedy_iou_insta_tutorial_ww0/flandre_visualization.png">flandre_visualization.png</a>
+<a href="output/greedy_iou_insta_tutorial_ww0/flandre_visualization.txt">flandre_visualization.txt</a>
+<a href="output/greedy_iou_insta_tutorial_ww0/heracross_visualization.png">heracross_visualization.png</a>
+<a href="output/greedy_iou_insta_tutorial_ww0/heracross_visualization.txt">heracross_visualization.txt</a>
+<a href="output/greedy_iou_insta_tutorial_ww0/salmon_visualization.png">salmon_visualization.png</a>
+<a href="output/greedy_iou_insta_tutorial_ww0/salmon_visualization.txt">salmon_visualization.txt</a>
 
-<div id="lightbox">
-  <img id="lightbox-img" src="" alt="">
-  <div id="lightbox-label"></div>
-</div>
+<h2>greedy_iou_insta_tutorial_ww3/</h2>
+<a href="output/greedy_iou_insta_tutorial_ww3/apple_visualization.png">apple_visualization.png</a>
+<a href="output/greedy_iou_insta_tutorial_ww3/apple_visualization.txt">apple_visualization.txt</a>
+<a href="output/greedy_iou_insta_tutorial_ww3/flandre_visualization.png">flandre_visualization.png</a>
+<a href="output/greedy_iou_insta_tutorial_ww3/flandre_visualization.txt">flandre_visualization.txt</a>
+<a href="output/greedy_iou_insta_tutorial_ww3/heracross_visualization.png">heracross_visualization.png</a>
+<a href="output/greedy_iou_insta_tutorial_ww3/heracross_visualization.txt">heracross_visualization.txt</a>
+<a href="output/greedy_iou_insta_tutorial_ww3/salmon_visualization.png">salmon_visualization.png</a>
+<a href="output/greedy_iou_insta_tutorial_ww3/salmon_visualization.txt">salmon_visualization.txt</a>
 
-<script>
-  const images = ['apple', 'flandre', 'heracross', 'salmon'];
+<h2>greedy_iou_insta_ww0/</h2>
+<a href="output/greedy_iou_insta_ww0/apple_visualization.png">apple_visualization.png</a>
+<a href="output/greedy_iou_insta_ww0/apple_visualization.txt">apple_visualization.txt</a>
+<a href="output/greedy_iou_insta_ww0/flandre_visualization.png">flandre_visualization.png</a>
+<a href="output/greedy_iou_insta_ww0/flandre_visualization.txt">flandre_visualization.txt</a>
+<a href="output/greedy_iou_insta_ww0/heracross_visualization.png">heracross_visualization.png</a>
+<a href="output/greedy_iou_insta_ww0/heracross_visualization.txt">heracross_visualization.txt</a>
+<a href="output/greedy_iou_insta_ww0/salmon_visualization.png">salmon_visualization.png</a>
+<a href="output/greedy_iou_insta_ww0/salmon_visualization.txt">salmon_visualization.txt</a>
 
-  const methods = [
-    { dir: 'greedy_iou_extended_ww0',        charset: 'extended',        ww: 'ww0' },
-    { dir: 'greedy_iou_extended_ww3',        charset: 'extended',        ww: 'ww3' },
-    { dir: 'greedy_iou_insta_ww0',           charset: 'insta',           ww: 'ww0' },
-    { dir: 'greedy_iou_insta_ww3',           charset: 'insta',           ww: 'ww3' },
-    { dir: 'greedy_iou_insta2_ww0',          charset: 'insta2',          ww: 'ww0' },
-    { dir: 'greedy_iou_insta2_ww3',          charset: 'insta2',          ww: 'ww3' },
-    { dir: 'greedy_iou_insta_tutorial_ww0',  charset: 'insta_tutorial',  ww: 'ww0' },
-    { dir: 'greedy_iou_insta_tutorial_ww3',  charset: 'insta_tutorial',  ww: 'ww3' },
-  ];
+<h2>greedy_iou_insta_ww3/</h2>
+<a href="output/greedy_iou_insta_ww3/apple_visualization.png">apple_visualization.png</a>
+<a href="output/greedy_iou_insta_ww3/apple_visualization.txt">apple_visualization.txt</a>
+<a href="output/greedy_iou_insta_ww3/flandre_visualization.png">flandre_visualization.png</a>
+<a href="output/greedy_iou_insta_ww3/flandre_visualization.txt">flandre_visualization.txt</a>
+<a href="output/greedy_iou_insta_ww3/heracross_visualization.png">heracross_visualization.png</a>
+<a href="output/greedy_iou_insta_ww3/heracross_visualization.txt">heracross_visualization.txt</a>
+<a href="output/greedy_iou_insta_ww3/salmon_visualization.png">salmon_visualization.png</a>
+<a href="output/greedy_iou_insta_ww3/salmon_visualization.txt">salmon_visualization.txt</a>
 
-  const nav = document.getElementById('nav');
-  const main = document.getElementById('main');
+<h2>greedy_iou_insta2_ww0/</h2>
+<a href="output/greedy_iou_insta2_ww0/apple_visualization.png">apple_visualization.png</a>
+<a href="output/greedy_iou_insta2_ww0/apple_visualization.txt">apple_visualization.txt</a>
+<a href="output/greedy_iou_insta2_ww0/flandre_visualization.png">flandre_visualization.png</a>
+<a href="output/greedy_iou_insta2_ww0/flandre_visualization.txt">flandre_visualization.txt</a>
+<a href="output/greedy_iou_insta2_ww0/heracross_visualization.png">heracross_visualization.png</a>
+<a href="output/greedy_iou_insta2_ww0/heracross_visualization.txt">heracross_visualization.txt</a>
+<a href="output/greedy_iou_insta2_ww0/salmon_visualization.png">salmon_visualization.png</a>
+<a href="output/greedy_iou_insta2_ww0/salmon_visualization.txt">salmon_visualization.txt</a>
 
-  images.forEach((img, i) => {
-    // Nav button
-    const btn = document.createElement('button');
-    btn.textContent = img;
-    btn.dataset.img = img;
-    if (i === 0) btn.classList.add('active');
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.querySelectorAll('.image-section').forEach(s => s.classList.remove('active'));
-      document.getElementById('section-' + img).classList.add('active');
-    });
-    nav.appendChild(btn);
-
-    // Section
-    const section = document.createElement('div');
-    section.className = 'image-section' + (i === 0 ? ' active' : '');
-    section.id = 'section-' + img;
-
-    const h2 = document.createElement('h2');
-    h2.textContent = img;
-    section.appendChild(h2);
-
-    const grid = document.createElement('div');
-    grid.className = 'grid';
-
-    methods.forEach(m => {
-      const src = `output/${m.dir}/${img}_visualization.png`;
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <img src="${src}" alt="${m.dir}" loading="lazy">
-        <div class="card-label">
-          <span class="charset">${m.charset}</span>
-          <span class="ww">${m.ww}</span>
-        </div>`;
-      card.addEventListener('click', () => openLightbox(src, `${img} — ${m.charset} ${m.ww}`));
-      grid.appendChild(card);
-    });
-
-    section.appendChild(grid);
-    main.appendChild(section);
-  });
-
-  // Lightbox
-  const lightbox = document.getElementById('lightbox');
-  const lbImg = document.getElementById('lightbox-img');
-  const lbLabel = document.getElementById('lightbox-label');
-
-  function openLightbox(src, label) {
-    lbImg.src = src;
-    lbLabel.textContent = label;
-    lightbox.classList.add('open');
-  }
-
-  lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') lightbox.classList.remove('open');
-  });
-</script>
+<h2>greedy_iou_insta2_ww3/</h2>
+<a href="output/greedy_iou_insta2_ww3/apple_visualization.png">apple_visualization.png</a>
+<a href="output/greedy_iou_insta2_ww3/apple_visualization.txt">apple_visualization.txt</a>
+<a href="output/greedy_iou_insta2_ww3/flandre_visualization.png">flandre_visualization.png</a>
+<a href="output/greedy_iou_insta2_ww3/flandre_visualization.txt">flandre_visualization.txt</a>
+<a href="output/greedy_iou_insta2_ww3/heracross_visualization.png">heracross_visualization.png</a>
+<a href="output/greedy_iou_insta2_ww3/heracross_visualization.txt">heracross_visualization.txt</a>
+<a href="output/greedy_iou_insta2_ww3/salmon_visualization.png">salmon_visualization.png</a>
+<a href="output/greedy_iou_insta2_ww3/salmon_visualization.txt">salmon_visualization.txt</a>
 
 </body>
 </html>
