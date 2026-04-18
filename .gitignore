@@ -1,17 +1,3 @@
-# Output folders
-output/
-demo_output/
-
-# Image files (general)
-*.png
-*.jpg
-*.jpeg
-
-# Exception: allow test images
-!test\ images/*.png
-!test\ images/*.jpg
-!test\ images/*.jpeg
-
 # Python
 __pycache__/
 *.py[cod]
