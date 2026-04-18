@@ -2,30 +2,6 @@
 # percentile is NOT set here — it is read from each image's sidecar .json file.
 
 methods:
-#  - name: "greedy_iou_extended"
-#    method: "greedy_iou"
-#    scale: 0.5
-#    misc_args:
-#      char_set: "extended"
-#      char_width: 8
-#      char_height: 16
-
-#  - name: "greedy_iou_standard"
-#    method: "greedy_iou"
-#    scale: 0.5
-#    misc_args:
-#      char_set: "standard"
-#      char_width: 8
-#      char_height: 16
-
-#  - name: "greedy_iou_all"
-#    method: "greedy_iou"
-#    scale: 0.5
-#    misc_args:
-#      char_set: "all"
-#      char_width: 8
-#      char_height: 16
-
   - name: "greedy_iou_insta_ww0"
     method: "greedy_iou_white_weighted"
     scale: 0.5
@@ -35,23 +11,23 @@ methods:
       char_height: 16
       white_weight: 0
 
-#  - name: "greedy_iou_insta_ww1"
-#    method: "greedy_iou_white_weighted"
-#    scale: 0.5
-#    misc_args:
-#      char_set: "insta"
-#      char_width: 8
-#      char_height: 16
-#      white_weight: 1
+  - name: "greedy_iou_insta_ww1"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta"
+      char_width: 8
+      char_height: 16
+      white_weight: 1
 
-#  - name: "greedy_iou_insta_ww2"
-#    method: "greedy_iou_white_weighted"
-#    scale: 0.5
-#    misc_args:
-#      char_set: "insta"
-#      char_width: 8
-#      char_height: 16
-#      white_weight: 2
+  - name: "greedy_iou_insta_ww2"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta"
+      char_width: 8
+      char_height: 16
+      white_weight: 2
 
   - name: "greedy_iou_insta_ww3"
     method: "greedy_iou_white_weighted"
@@ -62,6 +38,24 @@ methods:
       char_height: 16
       white_weight: 3
 
+  - name: "greedy_iou_insta_ww4"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta"
+      char_width: 8
+      char_height: 16
+      white_weight: 4
+
+  - name: "greedy_iou_insta_ww5"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta"
+      char_width: 8
+      char_height: 16
+      white_weight: 5
+
   - name: "greedy_iou_insta2_ww0"
     method: "greedy_iou_white_weighted"
     scale: 0.5
@@ -71,23 +65,23 @@ methods:
       char_height: 16
       white_weight: 0
 
-#  - name: "greedy_iou_insta2_ww1"
-#    method: "greedy_iou_white_weighted"
-#    scale: 0.5
-#    misc_args:
-#      char_set: "insta2"
-#      char_width: 8
-#      char_height: 16
-#      white_weight: 1
+  - name: "greedy_iou_insta2_ww1"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta2"
+      char_width: 8
+      char_height: 16
+      white_weight: 1
 
-#  - name: "greedy_iou_insta2_ww2"
-#    method: "greedy_iou_white_weighted"
-#    scale: 0.5
-#    misc_args:
-#      char_set: "insta2"
-#      char_width: 8
-#      char_height: 16
-#      white_weight: 2
+  - name: "greedy_iou_insta2_ww2"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta2"
+      char_width: 8
+      char_height: 16
+      white_weight: 2
 
   - name: "greedy_iou_insta2_ww3"
     method: "greedy_iou_white_weighted"
@@ -98,6 +92,24 @@ methods:
       char_height: 16
       white_weight: 3
 
+  - name: "greedy_iou_insta2_ww4"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta2"
+      char_width: 8
+      char_height: 16
+      white_weight: 4
+
+  - name: "greedy_iou_insta2_ww5"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta2"
+      char_width: 8
+      char_height: 16
+      white_weight: 5
+
   - name: "greedy_iou_insta_tutorial_ww0"
     method: "greedy_iou_white_weighted"
     scale: 0.5
@@ -106,6 +118,24 @@ methods:
       char_width: 8
       char_height: 16
       white_weight: 0
+
+  - name: "greedy_iou_insta_tutorial_ww1"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta_tutorial"
+      char_width: 8
+      char_height: 16
+      white_weight: 1
+
+  - name: "greedy_iou_insta_tutorial_ww2"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta_tutorial"
+      char_width: 8
+      char_height: 16
+      white_weight: 2
 
   - name: "greedy_iou_insta_tutorial_ww3"
     method: "greedy_iou_white_weighted"
@@ -116,6 +146,24 @@ methods:
       char_height: 16
       white_weight: 3
 
+  - name: "greedy_iou_insta_tutorial_ww4"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta_tutorial"
+      char_width: 8
+      char_height: 16
+      white_weight: 4
+
+  - name: "greedy_iou_insta_tutorial_ww5"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta_tutorial"
+      char_width: 8
+      char_height: 16
+      white_weight: 5
+
   - name: "greedy_iou_extended_ww0"
     method: "greedy_iou_white_weighted"
     scale: 0.5
@@ -125,23 +173,23 @@ methods:
       char_height: 16
       white_weight: 0
 
-#  - name: "greedy_iou_extended_ww1"
-#    method: "greedy_iou_white_weighted"
-#    scale: 0.5
-#    misc_args:
-#      char_set: "extended"
-#      char_width: 8
-#      char_height: 16
-#      white_weight: 1
+  - name: "greedy_iou_extended_ww1"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "extended"
+      char_width: 8
+      char_height: 16
+      white_weight: 1
 
-#  - name: "greedy_iou_extended_ww2"
-#    method: "greedy_iou_white_weighted"
-#    scale: 0.5
-#    misc_args:
-#      char_set: "extended"
-#      char_width: 8
-#      char_height: 16
-#      white_weight: 2
+  - name: "greedy_iou_extended_ww2"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "extended"
+      char_width: 8
+      char_height: 16
+      white_weight: 2
 
   - name: "greedy_iou_extended_ww3"
     method: "greedy_iou_white_weighted"
@@ -151,3 +199,21 @@ methods:
       char_width: 8
       char_height: 16
       white_weight: 3
+
+  - name: "greedy_iou_extended_ww4"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "extended"
+      char_width: 8
+      char_height: 16
+      white_weight: 4
+
+  - name: "greedy_iou_extended_ww5"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "extended"
+      char_width: 8
+      char_height: 16
+      white_weight: 5
