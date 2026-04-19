@@ -61,14 +61,11 @@ def render_character_to_array(char: str, width: int, height: int, font_size: int
     img = Image.new('L', (width, height), color=255)
     draw = ImageDraw.Draw(img)
 
-    # Load the same monospace font as save() for consistent matching
     font_paths = [
-        "/System/Library/Fonts/Menlo.ttc",
-        "/Library/Fonts/Courier New.ttf",
-        "/System/Library/Fonts/Courier.dfont",
+        "fonts/DejaVuSansMono.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+        "/System/Library/Fonts/Menlo.ttc",
         "C:\\Windows\\Fonts\\consola.ttf",
-        "C:\\Windows\\Fonts\\cour.ttf",
     ]
     font = None
     for path in font_paths:

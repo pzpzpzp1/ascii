@@ -34,14 +34,11 @@ class AsciiImage:
             bg_color: Background color tuple (R, G, B)
             text_color: Text color tuple (R, G, B)
         """
-        # Load a monospace font — prefer VSCode-style fonts
         font_paths = [
-            "/System/Library/Fonts/Menlo.ttc",                          # macOS (VSCode default)
-            "/Library/Fonts/Courier New.ttf",                           # macOS
-            "/System/Library/Fonts/Courier.dfont",                      # macOS fallback
-            "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",      # Linux
-            "C:\\Windows\\Fonts\\consola.ttf",                          # Windows (Consolas)
-            "C:\\Windows\\Fonts\\cour.ttf",                             # Windows
+            "fonts/DejaVuSansMono.ttf",                                 # project-local (all platforms)
+            "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",      # Linux system
+            "/System/Library/Fonts/Menlo.ttc",                          # macOS fallback
+            "C:\\Windows\\Fonts\\consola.ttf",                          # Windows fallback
         ]
         font = None
         for path in font_paths:
