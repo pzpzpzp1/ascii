@@ -62,10 +62,10 @@ def render_character_to_array(char: str, width: int, height: int, font_size: int
     draw = ImageDraw.Draw(img)
 
     font_paths = [
+        "fonts/Menlo.ttc",
+        "/System/Library/Fonts/Menlo.ttc",
         "fonts/DejaVuSansMono.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
-        "/System/Library/Fonts/Menlo.ttc",
-        "C:\\Windows\\Fonts\\consola.ttf",
     ]
     font = None
     for path in font_paths:

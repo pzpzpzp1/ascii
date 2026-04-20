@@ -35,10 +35,10 @@ class AsciiImage:
             text_color: Text color tuple (R, G, B)
         """
         font_paths = [
-            "fonts/DejaVuSansMono.ttf",                                 # project-local (all platforms)
-            "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",      # Linux system
-            "/System/Library/Fonts/Menlo.ttc",                          # macOS fallback
-            "C:\\Windows\\Fonts\\consola.ttf",                          # Windows fallback
+            "fonts/Menlo.ttc",
+            "/System/Library/Fonts/Menlo.ttc",
+            "fonts/DejaVuSansMono.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
         ]
         font = None
         for path in font_paths:
