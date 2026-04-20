@@ -324,7 +324,15 @@ h2{margin:1.5rem 0 0.3rem}
 
 
 <div id="tab-demo" class="tab">
-<pre style="font-family:Menlo,monospace;font-size:12px;line-height:1.2;white-space:pre;overflow-x:auto;background:#fff;color:#000;margin:0;padding:0">                                                                                                                                                                                       
+<div id="demo-controls" style="padding:0.4rem;background:#f0f0f0;display:flex;gap:0.5rem;align-items:center;font-family:monospace;font-size:12px">
+  <button onclick="demoZoom(1.25)">+</button>
+  <button onclick="demoZoom(0.8)">−</button>
+  <button onclick="demoFit()">fit</button>
+  <button onclick="demoReset()">1:1</button>
+</div>
+<div id="demo-viewport" style="width:100%;height:calc(100vh - 120px);overflow:hidden;position:relative;background:#fff;touch-action:none;cursor:grab">
+  <div id="demo-transform" style="position:absolute;transform-origin:0 0;will-change:transform">
+    <pre id="demo-pre" style="font-family:Menlo,monospace;font-size:12px;line-height:1.2;white-space:pre;margin:0;padding:0;color:#000;background:#fff;display:block">                                                                                                                                                                                       
                                                                                                                                                                                        
                                                                                                                                                                                        
                                                                                  ,·&quot;&quot;&quot;&quot;4.                                                                                              
@@ -439,9 +447,111 @@ h2{margin:1.5rem 0 0.3rem}
                                                             ``4kkkkkkkk$`                                                                                                              
                                                               7··`7``&quot;`                                                                                                                
                                                                                                                                                                                        </pre>
+  </div>
+</div>
 </div>
 
 <script>
+
+// Demo viewer: pan + pinch zoom
+(function() {
+  var vp, tr, pre;
+  var scale = 1, tx = 0, ty = 0;
+  var MIN_SCALE = 0.05, MAX_SCALE = 8;
+  var pointers = {}, lastDist = null, lastPX = null, lastPY = null;
+
+  function applyTransform() {
+    tr.style.transform = 'translate('+tx+'px,'+ty+'px) scale('+scale+')';
+  }
+
+  function demoFit() {
+    if (!pre) return;
+    scale = vp.clientWidth / pre.scrollWidth;
+    tx = 0; ty = 0;
+    applyTransform();
+  }
+
+  function demoReset() { scale = 1; tx = 0; ty = 0; applyTransform(); }
+
+  function demoZoom(factor) {
+    var cx = vp.clientWidth / 2, cy = vp.clientHeight / 2;
+    var ns = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * factor));
+    tx = cx - (cx - tx) * (ns / scale);
+    ty = cy - (cy - ty) * (ns / scale);
+    scale = ns; applyTransform();
+  }
+
+  window.demoFit = demoFit;
+  window.demoReset = demoReset;
+  window.demoZoom = demoZoom;
+
+  function onDown(e) {
+    pointers[e.pointerId] = {x: e.clientX, y: e.clientY};
+    vp.setPointerCapture(e.pointerId);
+    var pts = Object.values(pointers);
+    if (pts.length === 1) { lastPX = e.clientX; lastPY = e.clientY; }
+    lastDist = null;
+  }
+
+  function onMove(e) {
+    if (!pointers[e.pointerId]) return;
+    pointers[e.pointerId] = {x: e.clientX, y: e.clientY};
+    var pts = Object.values(pointers);
+    if (pts.length >= 2) {
+      var dx = pts[0].x - pts[1].x, dy = pts[0].y - pts[1].y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      var mx = (pts[0].x + pts[1].x) / 2, my = (pts[0].y + pts[1].y) / 2;
+      if (lastDist !== null) {
+        var ns = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * dist / lastDist));
+        var r = vp.getBoundingClientRect();
+        var px = mx - r.left, py = my - r.top;
+        tx = px - (px - tx) * (ns / scale);
+        ty = py - (py - ty) * (ns / scale);
+        scale = ns; applyTransform();
+      }
+      lastDist = dist; lastPX = null;
+    } else if (pts.length === 1 && lastPX !== null) {
+      tx += e.clientX - lastPX; ty += e.clientY - lastPY;
+      lastPX = e.clientX; lastPY = e.clientY;
+      applyTransform(); lastDist = null;
+    }
+  }
+
+  function onUp(e) {
+    delete pointers[e.pointerId];
+    var pts = Object.values(pointers);
+    if (pts.length < 2) lastDist = null;
+    if (pts.length === 0) { lastPX = null; lastPY = null; }
+  }
+
+  vp = document.getElementById('demo-viewport');
+  tr = document.getElementById('demo-transform');
+  pre = document.getElementById('demo-pre');
+
+  vp.addEventListener('pointerdown', onDown);
+  vp.addEventListener('pointermove', onMove);
+  vp.addEventListener('pointerup', onUp);
+  vp.addEventListener('pointercancel', onUp);
+  vp.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    var factor = e.deltaY < 0 ? 1.1 : 0.9;
+    var r = vp.getBoundingClientRect();
+    var px = e.clientX - r.left, py = e.clientY - r.top;
+    var ns = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * factor));
+    tx = px - (px - tx) * (ns / scale);
+    ty = py - (py - ty) * (ns / scale);
+    scale = ns; applyTransform();
+  }, {passive: false});
+
+  // fit on load and when tab is opened
+  window.addEventListener('load', demoFit);
+  document.querySelectorAll('.tabs button').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (btn.textContent === 'Demo') setTimeout(demoFit, 10);
+    });
+  });
+})();
+
 function switchTab(name, btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
