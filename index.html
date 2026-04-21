@@ -569,13 +569,21 @@ function switchTab(name, btn) {
   vp.addEventListener('pointercancel', onUp);
   vp.addEventListener('wheel', function(e) {
     e.preventDefault();
-    var factor = e.deltaY < 0 ? 1.07 : 0.93;
-    var r = vp.getBoundingClientRect();
-    var px = e.clientX - r.left, py = e.clientY - r.top;
-    var ns = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * factor));
-    tx = px - (px - tx) * (ns / scale);
-    ty = py - (py - ty) * (ns / scale);
-    scale = ns; applyTransform();
+    if (e.ctrlKey) {
+      // pinch-to-zoom (Mac trackpad pinch or ctrl+scroll)
+      var factor = e.deltaY < 0 ? 1.07 : 0.93;
+      var r = vp.getBoundingClientRect();
+      var px = e.clientX - r.left, py = e.clientY - r.top;
+      var ns = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * factor));
+      tx = px - (px - tx) * (ns / scale);
+      ty = py - (py - ty) * (ns / scale);
+      scale = ns;
+    } else {
+      // two-finger swipe → pan
+      tx -= e.deltaX;
+      ty -= e.deltaY;
+    }
+    applyTransform();
   }, {passive: false});
 
   window.addEventListener('load', function() {
