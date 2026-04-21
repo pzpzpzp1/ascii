@@ -6,6 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 import os
 from typing import Tuple, Callable
 import characters
+import font_utils
 
 
 class AsciiImage:
@@ -23,33 +24,16 @@ class AsciiImage:
         self.char_array = char_array
         self.height, self.width = char_array.shape
 
-    def save(self, outname: str, font_size: int = 12, bg_color=(255, 255, 255),
-             text_color=(0, 0, 0)):
+    def save(self, outname: str, bg_color=(255, 255, 255), text_color=(0, 0, 0)):
         """
         Render the ASCII image as a PNG and save it.
 
         Args:
             outname: Output filename for the PNG
-            font_size: Size of the monospace font to use
             bg_color: Background color tuple (R, G, B)
             text_color: Text color tuple (R, G, B)
         """
-        font_paths = [
-            "fonts/Menlo.ttc",
-            "/System/Library/Fonts/Menlo.ttc",
-            "fonts/DejaVuSansMono.ttf",
-            "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
-        ]
-        font = None
-        for path in font_paths:
-            if os.path.exists(path):
-                try:
-                    font = ImageFont.truetype(path, font_size)
-                    break
-                except Exception:
-                    continue
-        if font is None:
-            font = ImageFont.load_default()
+        font = font_utils.load_font()
 
         # Fixed cell dimensions: every character occupies exactly cell_w × cell_h pixels,
         # mirroring how a monospace .txt file looks in VSCode.

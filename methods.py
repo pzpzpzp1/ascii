@@ -7,6 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 import os
 from typing import Tuple
 import characters
+import font_utils
 
 
 def center_crop_to_ascii_ratio(img: Image.Image, char_aspect_ratio: float = 0.5) -> Image.Image:
@@ -44,7 +45,7 @@ def center_crop_to_ascii_ratio(img: Image.Image, char_aspect_ratio: float = 0.5)
     return img
 
 
-def render_character_to_array(char: str, width: int, height: int, font_size: int = 12) -> np.ndarray:
+def render_character_to_array(char: str, width: int, height: int) -> np.ndarray:
     """
     Render a single character as a binary numpy array.
 
@@ -52,33 +53,13 @@ def render_character_to_array(char: str, width: int, height: int, font_size: int
         char: Character to render
         width: Width of output array
         height: Height of output array
-        font_size: Font size to use
 
     Returns:
         Binary numpy array (0 or 1) representing the character
     """
-    # Create a small image to render the character
     img = Image.new('L', (width, height), color=255)
     draw = ImageDraw.Draw(img)
-
-    font_paths = [
-        "fonts/Menlo.ttc",
-        "/System/Library/Fonts/Menlo.ttc",
-        "fonts/DejaVuSansMono.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
-    ]
-    font = None
-    for path in font_paths:
-        if os.path.exists(path):
-            try:
-                font = ImageFont.truetype(path, font_size)
-                break
-            except Exception:
-                continue
-    if font is None:
-        font = ImageFont.load_default()
-
-    # Draw at natural top-left anchor — matches how save() positions each character
+    font = font_utils.load_font()
     draw.text((0, 0), char, fill=0, font=font)
 
     # Convert to numpy array and threshold

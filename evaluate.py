@@ -84,7 +84,7 @@ def create_visualization(img_path: str, method_name: str, method_func: str,
 
     ascii_img = AsciiImage.from_image(img, scale, method_func, **misc_args)
     temp_ascii_path = os.path.join(output_dir, 'temp_ascii.png')
-    ascii_img.save(temp_ascii_path, font_size=12)
+    ascii_img.save(temp_ascii_path)
     ascii_render = Image.open(temp_ascii_path).convert('RGB')
 
     target_height = scaled.size[1]
