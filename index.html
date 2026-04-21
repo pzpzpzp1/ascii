@@ -332,7 +332,7 @@ h2{margin:1.5rem 0 0.3rem}
 </div>
 <div id="demo-viewport" style="width:100%;height:calc(100vh - 120px);overflow:hidden;position:relative;background:#fff;touch-action:none;cursor:grab">
   <div id="demo-transform" style="position:absolute;transform-origin:0 0;will-change:transform">
-    <img id="demo-img" style="display:block;max-width:none;max-height:none">
+    <img id="demo-img" style="display:none;max-width:none;max-height:none">
     <pre id="demo-pre" style="font-family:Menlo;font-size:12px;line-height:1.2;white-space:pre;margin:0;padding:0;color:#000;background:#fff;display:none">                                                                                                                                                                                       
                                                                                                                                                                                        
                                                                                                                                                                                        
@@ -497,17 +497,9 @@ function switchTab(name, btn) {
       pre.style.display = 'block';
       var demoBtn = document.querySelector('.tabs button:nth-child(3)');
       switchTab('demo', demoBtn);
-      setTimeout(demoFit, 10);
+      // Double RAF ensures browser has done a full layout pass before measuring scrollWidth
+      requestAnimationFrame(function() { requestAnimationFrame(demoFit); });
     });
-  }
-
-  function loadImage(url) {
-    pre.style.display = 'none';
-    img.style.display = 'block';
-    img.onload = function() { scale = 1; tx = 0; ty = 0; applyTransform(); demoFit(); };
-    img.src = url;
-    var demoBtn = document.querySelector('.tabs button:nth-child(3)');
-    switchTab('demo', demoBtn);
   }
 
   window.demoFit = demoFit;
@@ -587,7 +579,7 @@ function switchTab(name, btn) {
   }, {passive: false});
 
   window.addEventListener('load', function() {
-    loadImage('output/greedy_iou_insta2_ww0/flandre35_visualization.png');
+    loadText('output/greedy_iou_insta2_ww0/flandre35_visualization.txt');
   });
 
   // TXT links open in the viewer instead of navigating away
