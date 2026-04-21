@@ -100,8 +100,8 @@ def calculate_white_weighted_iou(arr1: np.ndarray, arr2: np.ndarray, white_weigh
 
 
 def greedy_iou_method(img: Image.Image, scale: float, percentile: float = 50,
-                      char_set: str = 'extended', char_width: int = 8,
-                      char_height: int = 16) -> np.ndarray:
+                      char_set: str = 'extended', char_width: int = 7,
+                      char_height: int = 15) -> np.ndarray:
     """
     Convert image to ASCII using greedy pixel-wise IOU matching.
 
@@ -171,8 +171,8 @@ def greedy_iou_method(img: Image.Image, scale: float, percentile: float = 50,
 
 
 def greedy_iou_white_weighted_method(img: Image.Image, scale: float, percentile: float = 50,
-                                     char_set: str = 'insta', char_width: int = 8,
-                                     char_height: int = 16, white_weight: float = 2.0) -> np.ndarray:
+                                     char_set: str = 'insta', char_width: int = 7,
+                                     char_height: int = 15, white_weight: float = 2.0) -> np.ndarray:
     """
     Greedy IOU matching with white-pixel upweighting.
     White pixel matches count white_weight times more than black matches.
