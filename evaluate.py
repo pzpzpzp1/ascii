@@ -87,21 +87,45 @@ def create_visualization(img_path: str, method_name: str, method_func: str,
     ascii_img.save(temp_ascii_path)
     ascii_render = Image.open(temp_ascii_path).convert('RGB')
 
-    panels = [scaled, threshold_img, ascii_render]
-    max_w = max(p.size[0] for p in panels)
-    max_h = max(p.size[1] for p in panels)
+    # Build overlay of original + ascii render at native resolution before height-normalizing
+    def pad_centered(src, w, h):
+        canvas = Image.new('RGB', (w, h), (255, 255, 255))
+        canvas.paste(src, ((w - src.size[0]) // 2, (h - src.size[1]) // 2))
+        return canvas
 
-    arrays = []
+    max_ow = max(scaled.size[0], ascii_render.size[0])
+    max_oh = max(scaled.size[1], ascii_render.size[1])
+    overlay_img = Image.fromarray(
+        np.mean([
+            np.array(pad_centered(scaled, max_ow, max_oh), dtype=np.float32),
+            np.array(pad_centered(ascii_render, max_ow, max_oh), dtype=np.float32),
+        ], axis=0).clip(0, 255).astype(np.uint8)
+    )
+
+    target_height = scaled.size[1]
+
+    def resize_to_height(src, target_h):
+        new_w = int(target_h * src.size[0] / src.size[1])
+        return src.resize((new_w, target_h), Image.Resampling.LANCZOS)
+
+    scaled        = resize_to_height(scaled,        target_height)
+    threshold_img = resize_to_height(threshold_img, target_height)
+    ascii_render  = resize_to_height(ascii_render,  target_height)
+    overlay_img   = resize_to_height(overlay_img,   target_height)
+
+    separator = Image.new('RGB', (2, target_height), color=(255, 0, 0))
+    panels = [scaled, separator, threshold_img, separator, ascii_render, separator, overlay_img]
+    total_width = sum(p.size[0] for p in panels)
+
+    concatenated = Image.new('RGB', (total_width, target_height))
+    x_offset = 0
     for panel in panels:
-        canvas = Image.new('RGB', (max_w, max_h), (255, 255, 255))
-        canvas.paste(panel, ((max_w - panel.size[0]) // 2, (max_h - panel.size[1]) // 2))
-        arrays.append(np.array(canvas, dtype=np.float32))
-
-    overlaid = Image.fromarray(np.mean(arrays, axis=0).clip(0, 255).astype(np.uint8))
+        concatenated.paste(panel, (x_offset, 0))
+        x_offset += panel.size[0]
 
     img_basename = os.path.splitext(os.path.basename(img_path))[0]
     output_path = os.path.join(output_dir, f'{img_basename}_visualization.png')
-    overlaid.save(output_path)
+    concatenated.save(output_path)
 
     # Save ASCII as text file
     txt_path = os.path.join(output_dir, f'{img_basename}_visualization.txt')
