@@ -453,12 +453,19 @@ h2{margin:1.5rem 0 0.3rem}
 
 <script>
 
-// Demo viewer: pan + pinch zoom
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Demo viewer: pan + pinch-zoom
 (function() {
   var vp, tr, pre;
   var scale = 1, tx = 0, ty = 0;
   var MIN_SCALE = 0.005, MAX_SCALE = 8;
-  var pointers = {}, lastDist = null, lastPX = null, lastPY = null;
+  var pointers = {}, lastDist = null, lastMX = null, lastMY = null, lastPX = null, lastPY = null;
 
   function applyTransform() {
     tr.style.transform = 'translate('+tx+'px,'+ty+'px) scale('+scale+')';
@@ -481,6 +488,15 @@ h2{margin:1.5rem 0 0.3rem}
     scale = ns; applyTransform();
   }
 
+  function loadText(url) {
+    fetch(url).then(function(r) { return r.text(); }).then(function(text) {
+      pre.textContent = text;
+      var demoBtn = document.querySelector('.tabs button:nth-child(3)');
+      switchTab('demo', demoBtn);
+      setTimeout(demoFit, 10);
+    });
+  }
+
   window.demoFit = demoFit;
   window.demoReset = demoReset;
   window.demoZoom = demoZoom;
@@ -490,7 +506,7 @@ h2{margin:1.5rem 0 0.3rem}
     vp.setPointerCapture(e.pointerId);
     var pts = Object.values(pointers);
     if (pts.length === 1) { lastPX = e.clientX; lastPY = e.clientY; }
-    lastDist = null;
+    lastDist = null; lastMX = null; lastMY = null;
   }
 
   function onMove(e) {
@@ -502,14 +518,19 @@ h2{margin:1.5rem 0 0.3rem}
       var dist = Math.sqrt(dx*dx + dy*dy);
       var mx = (pts[0].x + pts[1].x) / 2, my = (pts[0].y + pts[1].y) / 2;
       if (lastDist !== null) {
-        var ns = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * dist / lastDist));
         var r = vp.getBoundingClientRect();
+        // Unified formula: zoom around new midpoint, anchor content under old midpoint.
+        // When dist unchanged this reduces to pure translation; when midpoint unchanged
+        // it reduces to pure zoom. 30% sensitivity reduction on pinch delta.
+        var dampedRatio = 1 + (dist / lastDist - 1) * 0.7;
+        var ns = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * dampedRatio));
         var px = mx - r.left, py = my - r.top;
-        tx = px - (px - tx) * (ns / scale);
-        ty = py - (py - ty) * (ns / scale);
+        var lpx = lastMX - r.left, lpy = lastMY - r.top;
+        tx = px - (lpx - tx) * (ns / scale);
+        ty = py - (lpy - ty) * (ns / scale);
         scale = ns; applyTransform();
       }
-      lastDist = dist; lastPX = null;
+      lastDist = dist; lastMX = mx; lastMY = my; lastPX = null;
     } else if (pts.length === 1 && lastPX !== null) {
       tx += e.clientX - lastPX; ty += e.clientY - lastPY;
       lastPX = e.clientX; lastPY = e.clientY;
@@ -520,7 +541,7 @@ h2{margin:1.5rem 0 0.3rem}
   function onUp(e) {
     delete pointers[e.pointerId];
     var pts = Object.values(pointers);
-    if (pts.length < 2) lastDist = null;
+    if (pts.length < 2) { lastDist = null; lastMX = null; lastMY = null; }
     if (pts.length === 0) { lastPX = null; lastPY = null; }
   }
 
@@ -534,7 +555,7 @@ h2{margin:1.5rem 0 0.3rem}
   vp.addEventListener('pointercancel', onUp);
   vp.addEventListener('wheel', function(e) {
     e.preventDefault();
-    var factor = e.deltaY < 0 ? 1.1 : 0.9;
+    var factor = e.deltaY < 0 ? 1.07 : 0.93;
     var r = vp.getBoundingClientRect();
     var px = e.clientX - r.left, py = e.clientY - r.top;
     var ns = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * factor));
@@ -543,21 +564,21 @@ h2{margin:1.5rem 0 0.3rem}
     scale = ns; applyTransform();
   }, {passive: false});
 
-  // fit on load and when tab is opened
   window.addEventListener('load', demoFit);
   document.querySelectorAll('.tabs button').forEach(function(btn) {
     btn.addEventListener('click', function() {
       if (btn.textContent === 'Demo') setTimeout(demoFit, 10);
     });
   });
-})();
 
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  btn.classList.add('active');
-}
+  // TXT links open in the viewer instead of navigating away
+  document.querySelectorAll('#tab-txt a[href$=".txt"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      loadText(a.href);
+    });
+  });
+})();
 </script>
 </body>
 </html>
