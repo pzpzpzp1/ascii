@@ -332,7 +332,8 @@ h2{margin:1.5rem 0 0.3rem}
 </div>
 <div id="demo-viewport" style="width:100%;height:calc(100vh - 120px);overflow:hidden;position:relative;background:#fff;touch-action:none;cursor:grab">
   <div id="demo-transform" style="position:absolute;transform-origin:0 0;will-change:transform">
-    <pre id="demo-pre" style="font-family:Menlo;font-size:12px;line-height:1.2;white-space:pre;margin:0;padding:0;color:#000;background:#fff;display:block">                                                                                                                                                                                       
+    <img id="demo-img" style="display:block;max-width:none;max-height:none">
+    <pre id="demo-pre" style="font-family:Menlo;font-size:12px;line-height:1.2;white-space:pre;margin:0;padding:0;color:#000;background:#fff;display:none">                                                                                                                                                                                       
                                                                                                                                                                                        
                                                                                                                                                                                        
                                                                                  ,·&quot;&quot;&quot;&quot;4.                                                                                              
@@ -462,7 +463,7 @@ function switchTab(name, btn) {
 
 // Demo viewer: pan + pinch-zoom
 (function() {
-  var vp, tr, pre;
+  var vp, tr, pre, img;
   var scale = 1, tx = 0, ty = 0;
   var MIN_SCALE = 0.005, MAX_SCALE = 8;
   var pointers = {}, lastDist = null, lastMX = null, lastMY = null, lastPX = null, lastPY = null;
@@ -472,8 +473,9 @@ function switchTab(name, btn) {
   }
 
   function demoFit() {
-    if (!pre) return;
-    scale = vp.clientWidth / pre.scrollWidth;
+    var contentW = (img.style.display !== 'none') ? img.naturalWidth : pre.scrollWidth;
+    if (!contentW) return;
+    scale = vp.clientWidth / contentW;
     tx = 0; ty = 0;
     applyTransform();
   }
@@ -491,10 +493,21 @@ function switchTab(name, btn) {
   function loadText(url) {
     fetch(url).then(function(r) { return r.text(); }).then(function(text) {
       pre.textContent = text;
+      img.style.display = 'none';
+      pre.style.display = 'block';
       var demoBtn = document.querySelector('.tabs button:nth-child(3)');
       switchTab('demo', demoBtn);
       setTimeout(demoFit, 10);
     });
+  }
+
+  function loadImage(url) {
+    pre.style.display = 'none';
+    img.style.display = 'block';
+    img.onload = function() { scale = 1; tx = 0; ty = 0; applyTransform(); demoFit(); };
+    img.src = url;
+    var demoBtn = document.querySelector('.tabs button:nth-child(3)');
+    switchTab('demo', demoBtn);
   }
 
   window.demoFit = demoFit;
@@ -548,6 +561,7 @@ function switchTab(name, btn) {
   vp = document.getElementById('demo-viewport');
   tr = document.getElementById('demo-transform');
   pre = document.getElementById('demo-pre');
+  img = document.getElementById('demo-img');
 
   vp.addEventListener('pointerdown', onDown);
   vp.addEventListener('pointermove', onMove);
@@ -564,11 +578,8 @@ function switchTab(name, btn) {
     scale = ns; applyTransform();
   }, {passive: false});
 
-  window.addEventListener('load', demoFit);
-  document.querySelectorAll('.tabs button').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      if (btn.textContent === 'Demo') setTimeout(demoFit, 10);
-    });
+  window.addEventListener('load', function() {
+    loadImage('output/greedy_iou_insta2_ww0/flandre35_visualization.png');
   });
 
   // TXT links open in the viewer instead of navigating away
