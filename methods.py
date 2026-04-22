@@ -116,44 +116,40 @@ def greedy_iou_method(img: Image.Image, scale: float, percentile: float = 50,
     Returns:
         2D numpy array of characters
     """
-    # Step 1: Resize image based on scale
     new_width = int(img.size[0] * scale)
     new_height = int(img.size[1] * scale)
     img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+    # Center-crop to exact char-cell multiples so the render is pixel-identical in size
+    crop_w = (new_width // char_width) * char_width
+    crop_h = (new_height // char_height) * char_height
+    left = (new_width - crop_w) // 2
+    top  = (new_height - crop_h) // 2
+    img = img.crop((left, top, left + crop_w, top + crop_h))
 
     gray_array = np.array(img.convert('L'))
     interesting = gray_array[(gray_array > 0) & (gray_array < 255)]
     threshold = np.percentile(interesting, percentile) if interesting.size > 0 else 128
     binary_img = (gray_array < threshold).astype(np.uint8)
 
-    # Step 6: Calculate grid dimensions
-    grid_height = new_height // char_height
-    grid_width = new_width // char_width
+    grid_height = crop_h // char_height
+    grid_width  = crop_w // char_width
 
-    # Step 7: Pre-render all characters in the character set
     char_list = characters.get_character_list(char_set)
     char_renders = {}
     for char in char_list:
         char_renders[char] = render_character_to_array(char, char_width, char_height)
 
-    # Step 8: Greedy matching - find best character for each grid cell
     result = np.empty((grid_height, grid_width), dtype=object)
 
     for y in range(grid_height):
         for x in range(grid_width):
-            # Extract the image patch for this grid cell
             y_start = y * char_height
-            y_end = min((y + 1) * char_height, new_height)
+            y_end   = y_start + char_height
             x_start = x * char_width
-            x_end = min((x + 1) * char_width, new_width)
+            x_end   = x_start + char_width
 
             patch = binary_img[y_start:y_end, x_start:x_end]
-
-            # Resize patch to char dimensions if needed
-            if patch.shape != (char_height, char_width):
-                patch_img = Image.fromarray((patch * 255).astype(np.uint8))
-                patch_img = patch_img.resize((char_width, char_height), Image.Resampling.NEAREST)
-                patch = (np.array(patch_img) > 128).astype(np.uint8)
 
             # Find best matching character
             best_char = ' '
@@ -181,13 +177,20 @@ def greedy_iou_white_weighted_method(img: Image.Image, scale: float, percentile:
     new_height = int(img.size[1] * scale)
     img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
+    # Center-crop to exact char-cell multiples so the render is pixel-identical in size
+    crop_w = (new_width // char_width) * char_width
+    crop_h = (new_height // char_height) * char_height
+    left = (new_width - crop_w) // 2
+    top  = (new_height - crop_h) // 2
+    img = img.crop((left, top, left + crop_w, top + crop_h))
+
     gray_array = np.array(img.convert('L'))
     interesting = gray_array[(gray_array > 0) & (gray_array < 255)]
     threshold = np.percentile(interesting, percentile) if interesting.size > 0 else 128
     binary_img = (gray_array < threshold).astype(np.uint8)
 
-    grid_height = new_height // char_height
-    grid_width = new_width // char_width
+    grid_height = crop_h // char_height
+    grid_width  = crop_w // char_width
 
     char_list = characters.get_character_list(char_set)
     char_renders = {char: render_character_to_array(char, char_width, char_height)
@@ -197,14 +200,11 @@ def greedy_iou_white_weighted_method(img: Image.Image, scale: float, percentile:
 
     for y in range(grid_height):
         for x in range(grid_width):
-            y_start, y_end = y * char_height, min((y + 1) * char_height, new_height)
-            x_start, x_end = x * char_width, min((x + 1) * char_width, new_width)
+            y_start = y * char_height
+            y_end   = y_start + char_height
+            x_start = x * char_width
+            x_end   = x_start + char_width
             patch = binary_img[y_start:y_end, x_start:x_end]
-
-            if patch.shape != (char_height, char_width):
-                patch_img = Image.fromarray((patch * 255).astype(np.uint8))
-                patch_img = patch_img.resize((char_width, char_height), Image.Resampling.NEAREST)
-                patch = (np.array(patch_img) > 128).astype(np.uint8)
 
             best_char = ' '
             best_score = -1

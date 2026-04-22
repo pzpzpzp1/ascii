@@ -333,7 +333,7 @@ h2{margin:1.5rem 0 0.3rem}
 <div id="demo-viewport" style="width:100%;height:calc(100vh - 120px);overflow:hidden;position:relative;background:#fff;touch-action:none;cursor:grab">
   <div id="demo-transform" style="position:absolute;transform-origin:0 0;will-change:transform">
     <img id="demo-img" style="display:none;max-width:none;max-height:none">
-    <pre id="demo-pre" style="font-family:Menlo;font-size:12px;line-height:1.2;white-space:pre;margin:0;padding:0;color:#000;background:#fff;display:none">                                                                                                                                                                                       
+    <pre id="demo-pre" style="font-family:Menlo;font-size:12px;line-height:15px;white-space:pre;margin:0;padding:0;color:#000;background:#fff;display:none">                                                                                                                                                                                       
                                                                                                                                                                                        
                                                                                                                                                                                        
                                                                                  ,·&quot;&quot;&quot;&quot;4.                                                                                              
@@ -497,8 +497,11 @@ function switchTab(name, btn) {
       pre.style.display = 'block';
       var demoBtn = document.querySelector('.tabs button:nth-child(3)');
       switchTab('demo', demoBtn);
-      // Double RAF ensures browser has done a full layout pass before measuring scrollWidth
-      requestAnimationFrame(function() { requestAnimationFrame(demoFit); });
+      // Wait for Menlo to finish loading before measuring scrollWidth — font
+      // load changes character advance widths and invalidates earlier measurements.
+      document.fonts.load('12px Menlo').then(function() {
+        requestAnimationFrame(demoFit);
+      });
     });
   }
 

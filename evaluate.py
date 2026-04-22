@@ -11,6 +11,7 @@ import yaml
 import numpy as np
 from PIL import Image
 from ascii_image import AsciiImage
+import font_utils
 
 _IMAGE_CONFIG_DEFAULTS = {'scale': 1.0, 'percentile': 50}
 
@@ -67,14 +68,22 @@ def create_visualization(img_path: str, method_name: str, method_func: str,
     percentile = img_config['percentile']
     misc_args = {**misc_args, 'percentile': percentile}
 
-    # Scale the full image (no cropping)
-    scaled = img.resize(
-        (int(img.size[0] * scale), int(img.size[1] * scale)),
-        Image.Resampling.LANCZOS
+    # Scale then center-crop to exact char-cell multiples — must match what the method does
+    cw, ch = font_utils.char_dims()
+    char_width  = misc_args.get('char_width',  cw)
+    char_height = misc_args.get('char_height', ch)
+
+    sw = int(img.size[0] * scale)
+    sh = int(img.size[1] * scale)
+    crop_w = (sw // char_width)  * char_width
+    crop_h = (sh // char_height) * char_height
+    left = (sw - crop_w) // 2
+    top  = (sh - crop_h) // 2
+    scaled = img.resize((sw, sh), Image.Resampling.LANCZOS).crop(
+        (left, top, left + crop_w, top + crop_h)
     )
 
-    gray_img = scaled.convert('L')
-    gray_array = np.array(gray_img)
+    gray_array = np.array(scaled.convert('L'))
 
     # Panel 2: threshold
     interesting = gray_array[(gray_array > 0) & (gray_array < 255)]
@@ -87,19 +96,11 @@ def create_visualization(img_path: str, method_name: str, method_func: str,
     ascii_img.save(temp_ascii_path)
     ascii_render = Image.open(temp_ascii_path).convert('RGB')
 
-    # Build overlay of original + ascii render at native resolution before height-normalizing
-    def pad_centered(src, w, h):
-        canvas = Image.new('RGB', (w, h), (255, 255, 255))
-        canvas.paste(src, ((w - src.size[0]) // 2, (h - src.size[1]) // 2))
-        return canvas
-
-    max_ow = max(scaled.size[0], ascii_render.size[0])
-    max_oh = max(scaled.size[1], ascii_render.size[1])
+    # Overlay: scaled and ascii_render are now identical size — simple average blend
     overlay_img = Image.fromarray(
-        np.mean([
-            np.array(pad_centered(scaled, max_ow, max_oh), dtype=np.float32),
-            np.array(pad_centered(ascii_render, max_ow, max_oh), dtype=np.float32),
-        ], axis=0).clip(0, 255).astype(np.uint8)
+        np.mean([np.array(scaled, dtype=np.float32),
+                 np.array(ascii_render, dtype=np.float32)], axis=0)
+        .clip(0, 255).astype(np.uint8)
     )
 
     target_height = scaled.size[1]
