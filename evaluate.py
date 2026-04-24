@@ -13,7 +13,7 @@ from PIL import Image
 from ascii_image import AsciiImage
 import font_utils
 
-_IMAGE_CONFIG_DEFAULTS = {'scale': 1.0, 'percentile': 50}
+_IMAGE_CONFIG_DEFAULTS = {'scale': 1.0, 'percentile': 50, 'disable': False}
 
 
 def _get_image_config(img_path: str) -> dict:
@@ -198,6 +198,9 @@ def run_evaluation():
         # Process each test image
         for j, img_path in enumerate(test_images, 1):
             img_name = os.path.basename(img_path)
+            if _get_image_config(img_path).get('disable', False):
+                print(f"  [{j}/{len(test_images)}] Skipping (disabled): {img_name}")
+                continue
             print(f"  [{j}/{len(test_images)}] Processing: {img_name}")
 
             try:

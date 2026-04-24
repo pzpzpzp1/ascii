@@ -1,4 +1,5 @@
 {
   "scale": 2.0,
-  "percentile": 50
+  "percentile": 50,
+  "disable": true
 }
