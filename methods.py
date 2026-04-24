@@ -71,28 +71,25 @@ def render_character_to_array(char: str, width: int, height: int) -> np.ndarray:
 
 def calculate_iou(arr1: np.ndarray, arr2: np.ndarray) -> float:
     """
-    Calculate Intersection over Union between two binary arrays.
+    Generalized IOU for continuous ink values in [0,1] (0=white, 1=black).
+    Reduces to standard binary IOU when inputs are binary.
     """
-    intersection = np.logical_and(arr1, arr2).sum()
-    union = np.logical_or(arr1, arr2).sum()
-
-    if union == 0:
-        return 1.0  # both arrays empty — perfect match (space character)
-
-    return intersection / union
+    intersection = np.minimum(arr1, arr2).sum()
+    union        = np.maximum(arr1, arr2).sum()
+    return (intersection / union) if union > 0 else 1.0
 
 
 def calculate_white_weighted_iou(arr1: np.ndarray, arr2: np.ndarray, white_weight: float = 2.0) -> float:
     """
-    Convex blend of standard IOU (black matching) and white-pixel accuracy (white matching).
-    alpha = white_weight / (1 + white_weight), so higher white_weight shifts weight toward white accuracy.
+    Convex blend of IOU (ink matching) and white accuracy (white matching), generalized to [0,1] ink values.
+    alpha = white_weight / (1 + white_weight)
     score = (1 - alpha) * iou + alpha * white_acc
     """
-    intersection = np.logical_and(arr1, arr2).sum()
-    union = np.logical_or(arr1, arr2).sum()
-    both_white = arr1.size - union
+    intersection = np.minimum(arr1, arr2).sum()
+    union        = np.maximum(arr1, arr2).sum()
+    both_white   = (1.0 - np.maximum(arr1, arr2)).sum()
 
-    iou = (intersection / union) if union > 0 else 1.0
+    iou       = (intersection / union) if union > 0 else 1.0
     white_acc = both_white / arr1.size
 
     alpha = white_weight / (1.0 + white_weight)
@@ -127,18 +124,15 @@ def greedy_iou_method(img: Image.Image, scale: float, percentile: float = 50,
     top  = (new_height - crop_h) // 2
     img = img.crop((left, top, left + crop_w, top + crop_h))
 
-    gray_array = np.array(img.convert('L'))
-    interesting = gray_array[(gray_array > 0) & (gray_array < 255)]
-    threshold = np.percentile(interesting, percentile) if interesting.size > 0 else 128
-    binary_img = (gray_array < threshold).astype(np.uint8)
+    # ink_img: 0.0 = white (no ink), 1.0 = black (full ink)
+    ink_img = 1.0 - np.array(img.convert('L'), dtype=np.float32) / 255.0
 
     grid_height = crop_h // char_height
     grid_width  = crop_w // char_width
 
     char_list = characters.get_character_list(char_set)
-    char_renders = {}
-    for char in char_list:
-        char_renders[char] = render_character_to_array(char, char_width, char_height)
+    char_renders = {char: render_character_to_array(char, char_width, char_height).astype(np.float32)
+                    for char in char_list}
 
     result = np.empty((grid_height, grid_width), dtype=object)
 
@@ -149,12 +143,10 @@ def greedy_iou_method(img: Image.Image, scale: float, percentile: float = 50,
             x_start = x * char_width
             x_end   = x_start + char_width
 
-            patch = binary_img[y_start:y_end, x_start:x_end]
+            patch = ink_img[y_start:y_end, x_start:x_end]
 
-            # Find best matching character
             best_char = ' '
             best_iou = -1
-
             for char, char_render in char_renders.items():
                 iou = calculate_iou(patch, char_render)
                 if iou > best_iou:
@@ -184,16 +176,14 @@ def greedy_iou_white_weighted_method(img: Image.Image, scale: float, percentile:
     top  = (new_height - crop_h) // 2
     img = img.crop((left, top, left + crop_w, top + crop_h))
 
-    gray_array = np.array(img.convert('L'))
-    interesting = gray_array[(gray_array > 0) & (gray_array < 255)]
-    threshold = np.percentile(interesting, percentile) if interesting.size > 0 else 128
-    binary_img = (gray_array < threshold).astype(np.uint8)
+    # ink_img: 0.0 = white (no ink), 1.0 = black (full ink)
+    ink_img = 1.0 - np.array(img.convert('L'), dtype=np.float32) / 255.0
 
     grid_height = crop_h // char_height
     grid_width  = crop_w // char_width
 
     char_list = characters.get_character_list(char_set)
-    char_renders = {char: render_character_to_array(char, char_width, char_height)
+    char_renders = {char: render_character_to_array(char, char_width, char_height).astype(np.float32)
                     for char in char_list}
 
     result = np.empty((grid_height, grid_width), dtype=object)
@@ -204,7 +194,7 @@ def greedy_iou_white_weighted_method(img: Image.Image, scale: float, percentile:
             y_end   = y_start + char_height
             x_start = x * char_width
             x_end   = x_start + char_width
-            patch = binary_img[y_start:y_end, x_start:x_end]
+            patch = ink_img[y_start:y_end, x_start:x_end]
 
             best_char = ' '
             best_score = -1
