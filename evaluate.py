@@ -65,7 +65,8 @@ def create_visualization(img_path: str, method_name: str, method_func: str,
 
     img_config = _get_image_config(img_path)
     scale = scale * img_config['scale']
-    percentile = img_config['percentile']
+    # Method-level percentile (from config misc_args) takes priority over image sidecar
+    percentile = misc_args.get('percentile', img_config['percentile'])
     misc_args = {**misc_args, 'percentile': percentile}
 
     # Scale then center-crop to exact char-cell multiples — must match what the method does
@@ -85,7 +86,7 @@ def create_visualization(img_path: str, method_name: str, method_func: str,
 
     gray_array = np.array(scaled.convert('L'))
 
-    # Panel 2: threshold
+    # Panel 2: the exact binary image the method processes (same threshold logic)
     interesting = gray_array[(gray_array > 0) & (gray_array < 255)]
     threshold = np.percentile(interesting, percentile) if interesting.size > 0 else 128
     binary_array = (gray_array < threshold).astype(np.uint8) * 255
