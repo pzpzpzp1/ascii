@@ -1,501 +1,88 @@
 <!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><title>output/</title>
-<style>
-@font-face {
-  font-family: 'Menlo';
-  src: url('fonts/Menlo.ttc') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-body{font-family:monospace;padding:2rem}
-a{display:block}
-h2{margin:1.5rem 0 0.3rem}
-.tabs{margin-bottom:1rem}
-.tabs button{margin-right:0.5rem;padding:0.2rem 0.8rem;cursor:pointer;font-family:monospace}
-.tabs button.active{font-weight:bold;text-decoration:underline}
-.tab{display:none}
-.tab.active{display:block}
-#tab-nodegraph {
-  height: calc(100vh - 120px);
-}
-#nodegraph-ui {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  height: 100%;
-}
-#node-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  align-items: center;
-  background: #f0f0f0;
-  border: 1px solid #ddd;
-  padding: 0.5rem;
-}
-#node-toolbar button {
-  padding: 0.2rem 0.6rem;
-  cursor: pointer;
-  font-family: monospace;
-}
-#node-hint {
-  margin-left: 0.5rem;
-  color: #444;
-}
-#node-canvas-wrap {
-  position: relative;
-  flex: 1;
-  border: 1px solid #ddd;
-  background: #1e1e1e;
-}
-#node-canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-</style>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litegraph.js@0.7.18/css/litegraph.css">
-<script src="https://cdn.jsdelivr.net/npm/litegraph.js@0.7.18/build/litegraph.min.js"></script>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASCII Node Graph</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litegraph.js@0.7.18/css/litegraph.css">
+  <script src="https://cdn.jsdelivr.net/npm/litegraph.js@0.7.18/build/litegraph.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --panel: #191c25;
+      --panel-2: #222736;
+      --border: #30374a;
+      --text: #e8ebf1;
+      --muted: #9da7bf;
+      --accent: #66a3ff;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    #app {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    #topbar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+      flex-wrap: wrap;
+    }
+    #title {
+      font-weight: 700;
+      margin-right: 0.8rem;
+    }
+    button {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.55rem;
+      font: inherit;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover { border-color: var(--accent); }
+    #hint {
+      color: var(--muted);
+      font-size: 12px;
+      margin-left: 0.6rem;
+    }
+    #legacy-link {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 12px;
+      text-decoration: none;
+    }
+    #legacy-link:hover { color: var(--text); }
+    #canvas-wrap {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      background: #11141b;
+    }
+    #graph {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: default;
+    }
+  </style>
 </head>
 <body>
-<h1>output/</h1>
-<div class="tabs">
-  <button class="active" onclick="switchTab('png',this)">PNG</button>
-  <button onclick="switchTab('txt',this)">TXT</button>
-  <button onclick="switchTab('demo',this)">Demo</button>
-  <button onclick="switchTab('nodegraph',this)">Node Graph</button>
-</div>
-
-<div id="tab-png" class="tab active">
-
-<h2>greedy_iou_extended_ww0/</h2>
-<a href="output/greedy_iou_extended_ww0/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_extended_ww0/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_extended_ww0/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_extended_ww0/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_extended_ww1/</h2>
-<a href="output/greedy_iou_extended_ww1/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_extended_ww1/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_extended_ww1/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_extended_ww1/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_extended_ww2/</h2>
-<a href="output/greedy_iou_extended_ww2/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_extended_ww2/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_extended_ww2/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_extended_ww2/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_extended_ww3/</h2>
-<a href="output/greedy_iou_extended_ww3/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_extended_ww3/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_extended_ww3/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_extended_ww3/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_extended_ww4/</h2>
-<a href="output/greedy_iou_extended_ww4/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_extended_ww4/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_extended_ww4/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_extended_ww4/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_extended_ww5/</h2>
-<a href="output/greedy_iou_extended_ww5/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_extended_ww5/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_extended_ww5/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_extended_ww5/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta_tutorial_ww0/</h2>
-<a href="output/greedy_iou_insta_tutorial_ww0/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww0/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww0/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww0/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta_tutorial_ww1/</h2>
-<a href="output/greedy_iou_insta_tutorial_ww1/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww1/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww1/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww1/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta_tutorial_ww2/</h2>
-<a href="output/greedy_iou_insta_tutorial_ww2/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww2/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww2/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww2/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta_tutorial_ww3/</h2>
-<a href="output/greedy_iou_insta_tutorial_ww3/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww3/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww3/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww3/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta_tutorial_ww4/</h2>
-<a href="output/greedy_iou_insta_tutorial_ww4/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww4/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww4/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww4/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta_tutorial_ww5/</h2>
-<a href="output/greedy_iou_insta_tutorial_ww5/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww5/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww5/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta_tutorial_ww5/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta_ww0/</h2>
-<a href="output/greedy_iou_insta_ww0/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta_ww0/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta_ww0/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta_ww0/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta_ww1/</h2>
-<a href="output/greedy_iou_insta_ww1/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta_ww1/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta_ww1/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta_ww1/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta_ww2/</h2>
-<a href="output/greedy_iou_insta_ww2/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta_ww2/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta_ww2/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta_ww2/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta_ww3/</h2>
-<a href="output/greedy_iou_insta_ww3/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta_ww3/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta_ww3/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta_ww3/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta_ww4/</h2>
-<a href="output/greedy_iou_insta_ww4/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta_ww4/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta_ww4/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta_ww4/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta_ww5/</h2>
-<a href="output/greedy_iou_insta_ww5/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta_ww5/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta_ww5/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta_ww5/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta2_ww0/</h2>
-<a href="output/greedy_iou_insta2_ww0/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww0/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww0/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww0/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta2_ww1/</h2>
-<a href="output/greedy_iou_insta2_ww1/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww1/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww1/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww1/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta2_ww2/</h2>
-<a href="output/greedy_iou_insta2_ww2/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww2/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww2/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww2/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta2_ww3/</h2>
-<a href="output/greedy_iou_insta2_ww3/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww3/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww3/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww3/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta2_ww4/</h2>
-<a href="output/greedy_iou_insta2_ww4/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww4/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww4/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww4/heracross_visualization.png">heracross_visualization.png</a>
-
-<h2>greedy_iou_insta2_ww5/</h2>
-<a href="output/greedy_iou_insta2_ww5/flandre25_visualization.png">flandre25_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww5/flandre3_visualization.png">flandre3_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww5/flandre35_visualization.png">flandre35_visualization.png</a>
-<a href="output/greedy_iou_insta2_ww5/heracross_visualization.png">heracross_visualization.png</a>
-
-</div>
-
-<div id="tab-txt" class="tab">
-
-<h2>greedy_iou_extended_ww0/</h2>
-<a href="output/greedy_iou_extended_ww0/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww0/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww0/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww0/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_extended_ww1/</h2>
-<a href="output/greedy_iou_extended_ww1/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww1/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww1/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww1/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_extended_ww2/</h2>
-<a href="output/greedy_iou_extended_ww2/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww2/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww2/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww2/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_extended_ww3/</h2>
-<a href="output/greedy_iou_extended_ww3/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww3/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww3/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww3/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_extended_ww4/</h2>
-<a href="output/greedy_iou_extended_ww4/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww4/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww4/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww4/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_extended_ww5/</h2>
-<a href="output/greedy_iou_extended_ww5/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww5/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww5/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_extended_ww5/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta_tutorial_ww0/</h2>
-<a href="output/greedy_iou_insta_tutorial_ww0/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww0/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww0/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww0/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta_tutorial_ww1/</h2>
-<a href="output/greedy_iou_insta_tutorial_ww1/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww1/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww1/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww1/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta_tutorial_ww2/</h2>
-<a href="output/greedy_iou_insta_tutorial_ww2/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww2/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww2/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww2/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta_tutorial_ww3/</h2>
-<a href="output/greedy_iou_insta_tutorial_ww3/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww3/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww3/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww3/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta_tutorial_ww4/</h2>
-<a href="output/greedy_iou_insta_tutorial_ww4/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww4/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww4/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww4/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta_tutorial_ww5/</h2>
-<a href="output/greedy_iou_insta_tutorial_ww5/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww5/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww5/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta_tutorial_ww5/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta_ww0/</h2>
-<a href="output/greedy_iou_insta_ww0/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww0/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww0/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww0/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta_ww1/</h2>
-<a href="output/greedy_iou_insta_ww1/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww1/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww1/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww1/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta_ww2/</h2>
-<a href="output/greedy_iou_insta_ww2/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww2/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww2/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww2/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta_ww3/</h2>
-<a href="output/greedy_iou_insta_ww3/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww3/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww3/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww3/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta_ww4/</h2>
-<a href="output/greedy_iou_insta_ww4/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww4/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww4/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww4/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta_ww5/</h2>
-<a href="output/greedy_iou_insta_ww5/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww5/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww5/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta_ww5/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta2_ww0/</h2>
-<a href="output/greedy_iou_insta2_ww0/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww0/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww0/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww0/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta2_ww1/</h2>
-<a href="output/greedy_iou_insta2_ww1/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww1/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww1/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww1/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta2_ww2/</h2>
-<a href="output/greedy_iou_insta2_ww2/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww2/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww2/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww2/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta2_ww3/</h2>
-<a href="output/greedy_iou_insta2_ww3/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww3/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww3/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww3/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta2_ww4/</h2>
-<a href="output/greedy_iou_insta2_ww4/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww4/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww4/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww4/heracross_visualization.txt">heracross_visualization.txt</a>
-
-<h2>greedy_iou_insta2_ww5/</h2>
-<a href="output/greedy_iou_insta2_ww5/flandre25_visualization.txt">flandre25_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww5/flandre3_visualization.txt">flandre3_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww5/flandre35_visualization.txt">flandre35_visualization.txt</a>
-<a href="output/greedy_iou_insta2_ww5/heracross_visualization.txt">heracross_visualization.txt</a>
-
-</div>
-
-
-<div id="tab-demo" class="tab">
-<div id="demo-controls" style="padding:0.4rem;background:#f0f0f0;display:flex;gap:0.5rem;align-items:center;font-family:monospace;font-size:12px">
-  <button onclick="demoZoom(1.25)">+</button>
-  <button onclick="demoZoom(0.8)">−</button>
-  <button onclick="demoFit()">fit</button>
-  <button onclick="demoReset()">1:1</button>
-</div>
-<div id="demo-viewport" style="width:100%;height:calc(100vh - 120px);overflow:hidden;position:relative;background:#fff;touch-action:none;cursor:grab">
-  <div id="demo-transform" style="position:absolute;transform-origin:0 0;will-change:transform">
-    <img id="demo-img" style="display:none;max-width:none;max-height:none">
-    <pre id="demo-pre" style="font-family:Menlo;font-size:12px;line-height:15px;white-space:pre;margin:0;padding:0;color:#000;background:#fff;display:none">                                                                                                                                                                                       
-                                                                                                                                                                                       
-                                                                                                                                                                                       
-                                                                                 ,·&quot;&quot;&quot;&quot;4.                                                                                              
-                                                                     ,,,     ·&quot;``         :,  ````&quot;·,              ,,                                                                  
-                                                                .i&quot;`·.     `,  L            :        &quot;.         ,$`$k                                                                  
-                                                              ·`       S.    ¨` .·&quot;&quot;&quot;&quot;&quot;&quot;44., 4,,       ¨S,   ,$kkL kL   ,                                                              
-                                                            &quot;           .&quot;`&quot; ` &quot;,.·   ``·,. `&quot;I&quot;kk,,. ·&quot;·4$ dkkk$  k ,d`k                                                              
-                                                            k        ,&quot;   ,...&quot;       .&quot;   ?  ?           ,kkkkkk jkkk$ k                                                              
-                                                            .k  .·`,·   `  :        ,¨         ¨     .·&quot;¨kkkkkkkk $kkkL k                                                              
-                                                         .¨ ,7&quot;  .` ,`   ,`             :           ¨,`.jkkkkkkkk  kkkk,$L                                                             
-                                                       ,·&quot;     ,`  ,    j         :   ,              ¨· kkkkkkkkk ,kkkkLjkL                                                            
-                                                      7       7   .     `       ,`   ,  j             ` 4kkkkkk`,$kkkkk$ k                                                             
-                                                     j           7·            j        I      L         $kkkk`jkkkkkkk`d$    ,,,$$$4·                                                 
-                                                     &quot;,     .&quot;  j      ?     ·``    j   k   $  &quot;          kkk` kk kk&quot;,,k&quot;   $kkkk,,                                                    
-                                                       &quot;L  ¨ ,L  L    :.¨ .&quot; `&quot;.    k   j   j   i         $¨k kk  i,kk`    kkkkkkkkkL                                                  
-                                                         4` ¨ ¨ `    7  ·`     .        k   i    i         , &quot;kL   $     ,kkkkkkkkkkkkL                                                
-                              &quot;&quot;4$L,                   .&quot;`     `   7  , jk4k$, ¨.      , S`&quot;&quot;k,   &quot;,       $  `    `k   ,kkkkkkkkkkkkkkk                                               
-                                  $kkL              ,&quot;  .    ,k  ,`  LLk  &quot;4kk,  ·  j  `  ¨L L:`·   L    L  k       k ·.kkkkkk&quot;&quot;&quot;kkkkkkkk,                                             
-                                 4kkkkk,          ,`  ,`    , L d    jd   $kkk`   ? Lj`,,,,,jk `,`  &quot;$,   k,`k      ¨$   &quot;4kk      `kkkkkkL                                            
-                                jkkkkkkk,        ,   d`     k IIk    j    ?kkk     $`` ``,$kkk,  ·   k$,  $k&quot;&quot;`,     &quot;,4,    `&quot;&quot;4.   4kkkkkkL                                          
-                               jkkkkkkkkk,         ,`j      k &quot;L    ,i   :d&quot;`      I`   j,kkkL$k  `i k k  jk, &quot;.·,     &quot;.`·.,      &quot;..74kkkkkkL,                                       
-                              jkkkkkkkkkkkk,    i  ` &quot;,        k.   &quot;,L         .      jkkkk$  kL  &quot;   j  dkk. i  ¨         ¨`¨`          `4kkkkkj,,                                   
-                             4kkkkkkk&quot;kkkkkkL    L L    &quot;·,          &quot;`·,              4kkk&quot;  d&quot;k ·I`  k dkkkk&quot;.     `          .·&quot;`` i  `&quot;,&quot;kkkkkkkkkj,,                              
-                           ,kkkkk&quot;kk, `kkkkkkk    &quot;·$      k     L    &quot;,    j  `&quot;·,      `    ,j 7·    k¨ 7k&quot;.   ¨L,,..,...4L`  ¨?,    L   &quot;` &quot;kkkkkkkkkkkkk$L,                        
-                          4kkkk`      `&quot;kkkkkkkL     &quot;           L.    &quot;,    .    ¨L        ,j. &quot;      L  k      ik&quot;&quot;  j    &quot;·44.,j    k    ,  `,&quot;kkkkkkkkkkkkkk$,                     
-                        jkkkk`         ¨  &quot;kkkkkkk,        7 jL` &quot; i,   Ik,    &quot;&quot;`        ,&quot; ,.44k..   , jkL..  4&quot;   k j          i   ,`  d      $  `&quot;k &quot;4kkkkkkkkk,                   
-                      4kkkkk,,,,     ,`    ¨4kkkkkkk$, &quot;,,&quot;.&quot; i `,¨d 4,  L.$.     ,,,,i4&quot;&quot;L?¨  LL    S ``   ,d  &quot; ``&quot;$ ·..        4 ,&quot;     &quot;,    `   j   `   `&quot;kkkkkkL                 
-                    jkkkk&quot;kk`                `kkkkkkkkkk,      &quot;.L&quot;·j ·· $ k  ``    k,7&quot;&quot;` ,.,·&quot;&quot;.·`   ,.·&quot;L 7$&quot; k   `    k     ,i·`        ¨.  j    L    `     `$kkkkk,               
-                  ,kkkkkk  ·               ,.·&quot;L&quot;kkkkkkkkk$,    .&quot;`` L   Ld       . `     &quot;.`,·&quot;`   .4,j&quot;4, i  &quot;7d  &quot;     &quot;    7`             S      k     j     , 4kkkkk              
-                 dkkkkk$    ¨.         ·&quot;`     L  `&quot;kkkkkkkkkk&quot;`. .     7`    ,,&quot;     .L ,I·`        ,  `&quot;&quot;L L   `L&quot;`      L                   &quot;      L    `     `  4kkkkk             
-               ,$,kkkkkL     j        j                &quot;&quot;kkkkk$k&quot;. &quot;,  ` ¨.   ¨      ` k¨`       I   `&quot;,.,    `&quot;,  `&quot;·4.,  ?           ,,,,,,     4¨   k  I     ` ,  k&quot;kkkk            
-              jkjkkkk`j      L        `             ,.·&quot;&quot;k `&quot;4kk  &quot;,&quot;        ` .·,`·&quot;`  ,·,4L           ·, j&quot;&quot;&quot;&quot;&quot;          `        &quot;&quot;&quot;&quot;&quot;&quot;&quot;4kkk 4$` ,,  kj     ? &quot;k j ,`kkkk           
-             jkkkkkk  ?,    7        j     ,.·&quot;  &quot;`      k     7L $&quot;.` ,,, $L ·,&quot;``$kkk¨   ·,`k,       ,  &quot;.     $                           7kkkkkkkkkkL`      L ` k,`  $$kL          
-            ,kkkj&quot;$    ¨L            k:&quot;`        L       k   .`  jkkL `   7.&quot;,,,,$kkk$  :. ·&quot;.· 4,     $`k,  k, &quot; L                         ,kk&quot;        `&quot;L     &quot; k&quot;,     Lkk          
-            kkkkk  &quot;,    k k                            ,L ,`    $kkkkkk  `  kkkkkkkk$      ·  &quot;&quot;&quot;&quot;&quot;&quot;k  L  `4, $&quot;&quot;4                   ,,,$kkkk$           `      $ 4      ,&quot;kL         
-           kkkkkL    ·,   ?                          ,·`   ?     &quot;kk,kkkk.,.&quot;```&quot;kkkkk,,...L   k$``` IL ?                     ,,j$$kkkkkkkkkkkk,                  &quot;      &quot;  $k         
-          $kkkkk      j                          L·`             $kkkkk$  `       &quot;&quot;,,,,,    4kkk    &quot;&quot;L ?,                ,$kkkkkkkkkkkkkkkkkkkL                      .`   $k         
-         jkkkkk       k                                     j    ikkkkk L  `,            ,`:$kkk$ &quot;:  L &quot;&quot;`              ,kkk&quot;`  `$kkkkkkkkkkkkkkk,                    k    ik         
-         $kkkk` `S,                                         j ·   kkkkk      `:.       .`   4kkkk$,,`  L                 kkkkL,,,,kkkkkkkkkk44kkkkk                    j   ,$`         
-         kkk`&quot;·.   `4j                                      44, &quot; `kkkk                 ` 4$kkkkkkkkk .,                  &quot;kkkkkkkkkkkkkkL     kkk$                    j  .            
-         kkkL    `&quot;.                                          ¨S ,kkkkk          ,    j  kkkkkkkkkkkkL L                        jkkk`&quot;kkkkkkkkkkk&quot;                     i ?             
-         kkkk      j                                          j ,kkkkkk       .·L·.   I  kkkkkkkkkkkk&quot;                       ,dkkk`    `&quot;&quot;&quot;4&quot;&quot;&quot;`                       &quot;`              
-         LkkI      ¨                                          k  kkkkkk   : d    &quot;d ,$  ,kkkkkkkkkkkk· &quot;                   ,kkk&quot;                                                       
-         $kkL `&quot;.,  L                                          . kkkkkL    Ik,kkkkkkkkkkkkkkkkkkkkkk`  &quot;                ,$kkk`                                                         
-         &quot;$k      `:d                                         ,7 $kkkkk,   jkkkkkkkkkkkkkkkkkkkkkkkk·   k,           ,$dkk&quot;                                                            
-          kk                              ,·&quot;&quot;&quot;,             j,$ `&quot;kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk&quot;   $$kkkkL,.  ,.dkk$&quot;`.···4.,                                                       
-          ?,``&quot;&quot;·.,                       L ,$kkkk$,,  . ,, &quot;,kkk,, &quot;kkkkkkkkkkkkkkkkkkkkkkkkkkkkL   jkkkkkkkkk,j$kkk$d$j,      ¨$                                                     
-           k,     ¨,                    ·¨,$kkkkkkkkkkj$k$$kkkkkkkk   &quot;kkk44kkkkkkkkkkkkkkkkkkk`  jkkkkkkkkkkkkkkkkkkkkkkkkk,    j   .·.                                               
-           4k.     &quot;               ,,,j$$kkkkkkkkkkkkkkkkkkkkkkkkkkkL,,   ,,,  `&quot;kkkkkkkkkkkk`L ,,kkkkkkkkkkkkkkkkkkkkkkkkkkkL    4&quot;.   &quot;,                                             
-            $&quot;      $     ,·&quot;&quot;`&quot;4kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk$$$kkkk,   ``````&quot;``    4kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk,  ,`     ¨,                                            
-              &quot;&quot;·4...k  ,`·       &quot;$kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkL,,  ,d$$,,,$kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk,¨        k                                            
-                        k  ¨        `4kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk ,,,     k .:&quot;,                                       
-                        k   I   ,·4,```&quot;kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk$L,    .¨    ¨.                                      
-                        &quot;   k .,·:&quot;&quot;·    `kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk$       &quot;,                                     
-                  k,     4     ,,    i    7kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk        ,                                    
-                   &quot;k,    ·4`             4kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk       $                                    
-              ,,,$L,$kL     &quot;         L ·  kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkL$kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk,   ,,·`                                    
-            &quot;`&quot;&quot;&quot;kkkkkk     ,        .¨    $kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk ·¨ L                                      
-               ,,kkkkkkk    k   ,&quot; ·`      jkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk`   k                                      
-             .&quot;` $k`    ,4kkkk j44L        $kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkL   &quot;                                      
-                 k  ,jkkkk&quot;&quot;` `&quot;` ¨,      jkkkkkkkkkkkkkkkkkkkkkk`       &quot;kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk     `L                                    
-                &quot;kkkkkk&quot;            4&quot;k` .kkkkkkkkkkkkk&quot;```&quot;&quot;&quot;.`,,       ,  &quot;kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk      i                                    
-                 &quot;k&quot;`                  L  `kkkkkkkkk`,,      &quot;` ,&quot;  7,    .`   `kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk&quot;                                           
-                                      7    7kkkkkkk    `.     ,`     `,  ¨,d·   `&quot;kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk...,    7                                    
-                                     ,      kkkkkkk   .  :.  &quot;        : `¨ k &quot;     7kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk&quot;`      ,744                                     
-                                     k     `&quot;kkkkkkkj,     ,k       ,`        ?      &quot;kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk                                                  
-                                     &quot;    `   &quot;kkkkkkkL   7 i      &quot;      j  k    &quot;  ` &quot;kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk`j        j                                         
-                                      `,   &quot;¨````&quot;kkkkk  ¨   L            I  &quot;          ` `kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk&quot;  `        7                                         
-                                        ·&quot;``:      &quot;4kk                   L  ,k.    ··.    `&quot;kkkkkkkkkkkkkkkkkkkkkkkk    &quot;4kkkk$`         ·&quot;`                                          
-                                             $                           j   $  &quot;.   .` S     &quot;$&quot;&quot;kkkkkkkkkk&quot;`&quot;kk&quot;`j     ,.,&quot;k&quot;   ¨     j`                                             
-                                              L       L                  k  iL   j &quot;`    ?   ,     &quot;&quot;kkkk&quot;7    &quot;       .`    &quot; &quot;,                                                      
-                                              &quot;,       ,       `&quot;L      j   k    j       &quot;.         :        ,,,      j          ¨      i                                              
-                                                ,       S,              L  ,`    k        j`,&quot;&quot;&quot;```&quot;4,    d      $   .`      7  ,..     I                                              
-                                                 &quot;4,      ·,         &quot;4I   $     k        ,&quot;         k    7   k   ``   I ,.·¨ .` &quot;·L ,.¨                                               
-                                                    `&quot;··44j`L   &quot;      i   k     ¨k     ·`            `&quot;`     j         ?  ` `                                                         
-                                                          &quot;,               L        &quot;&quot;&quot;                       ¨,        j   $L                                                         
-                                                            ¨·.         L j                                    ¨L     .·`&quot;·,.&quot;                                                         
-                                                             7  `&quot;&quot;&quot;·,    $                                      `L  `  .`                                                             
-                                                             `        `` jL                                        `$,·`                                                               
-                                                            $            $                                                                                                             
-                                                            k           j`                                                                                                             
-                                                                        k                                                                                                              
-                                                           j           j                                                                                                               
-                                                           $           `                                                                                                               
-                                                           $          4                                                                                                                
-                                                           $          `                                                                                                                
-                                                           $         4                                                                                                                 
-                                                           $         L                                                                                                                 
-                                                           i        j                                                                                                                  
-                                                           i        j                                                                                                                  
-                                                                    k                                                                                                                  
-                                                          &quot; L       &quot;,                                                                                                                 
-                                                        ,   k       L ·,                                                                                                               
-                                                        &quot;  :k         j L                                                                                                              
-                                                         i  &quot;        &quot;  k                                                                                                              
-                                                          L   &quot;·, .¨   7                                                                                                               
-                                                                      ,                                                                                                                
-                                                         ¨L           7                                                                                                                
-                                                           `j,       ,&quot;                                                                                                                
-                                                            k `·444 `$                                                                                                                 
-                                                            j     ¨  4                                                                                                                 
-                                                            kL       k                                                                                                                 
-                                                           jkL       $                                                                                                                 
-                                                           Lk,4kkkkkkd,                                                                                                                
-                                                           Lkk&quot;      &quot;k                                                                                                                
-                                                           ,k ,$kkkk$Lj                                                                                                                
-                                                           $kkkkkkkkkkkk                                                                                                               
-                                                           $kkkkkkkkkkkkk                                                                                                              
-                                                           $kkkkkkkkkkkkkL                                                                                                             
-                                                           IL$kkkkkkkkkkkk                                                                                                             
-                                                           &quot;&quot;kkkkkkkkkjk$                                                                                                              
-                                                            ``4kkkkkkkk$`                                                                                                              
-                                                              7··`7``&quot;`                                                                                                                
-                                                                                                                                                                                       </pre>
-  </div>
-</div>
-</div>
-
-<div id="tab-nodegraph" class="tab">
-  <div id="nodegraph-ui">
-    <div id="node-toolbar">
+  <div id="app">
+    <div id="topbar">
+      <div id="title">ASCII Node Graph</div>
       <button type="button" data-add-node="ascii/image">Image</button>
       <button type="button" data-add-node="ascii/look">Look</button>
       <button type="button" data-add-node="ascii/centercrop">CenterCrop</button>
@@ -503,547 +90,383 @@ h2{margin:1.5rem 0 0.3rem}
       <button type="button" data-add-node="ascii/greyscale">Greyscale</button>
       <button type="button" data-add-node="ascii/threshold">Threshold</button>
       <button type="button" data-add-node="ascii/canny">Canny-Edge</button>
-      <span id="node-hint">Drop a PNG onto the graph to feed the first Image node.</span>
+      <button type="button" id="btn-reset-view">Reset View</button>
+      <span id="hint">Drop an image anywhere on the graph to load it into the first Image node.</span>
+      <a id="legacy-link" href="old_index.html">deprecated old tabs</a>
     </div>
-    <div id="node-canvas-wrap">
-      <canvas id="node-canvas"></canvas>
+    <div id="canvas-wrap">
+      <canvas id="graph"></canvas>
     </div>
   </div>
-</div>
 
-<script>
-
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  btn.classList.add('active');
-}
-
-// Demo viewer: pan + pinch-zoom
-(function() {
-  var vp, tr, pre, img;
-  var scale = 1, tx = 0, ty = 0;
-  var MIN_SCALE = 0.005, MAX_SCALE = 8;
-  var pointers = {}, lastDist = null, lastMX = null, lastMY = null, lastPX = null, lastPY = null;
-
-  function applyTransform() {
-    tr.style.transform = 'translate('+tx+'px,'+ty+'px) scale('+scale+')';
-  }
-
-  function demoFit() {
-    var contentW = (img.style.display !== 'none') ? img.naturalWidth : pre.scrollWidth;
-    if (!contentW) return;
-    scale = vp.clientWidth / contentW;
-    tx = 0; ty = 0;
-    applyTransform();
-  }
-
-  function demoReset() { scale = 1; tx = 0; ty = 0; applyTransform(); }
-
-  function demoZoom(factor) {
-    var cx = vp.clientWidth / 2, cy = vp.clientHeight / 2;
-    var ns = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * factor));
-    tx = cx - (cx - tx) * (ns / scale);
-    ty = cy - (cy - ty) * (ns / scale);
-    scale = ns; applyTransform();
-  }
-
-  function loadText(url) {
-    fetch(url).then(function(r) { return r.text(); }).then(function(text) {
-      pre.textContent = text;
-      img.style.display = 'none';
-      pre.style.display = 'block';
-      var demoBtn = document.querySelector('.tabs button:nth-child(3)');
-      switchTab('demo', demoBtn);
-      // Wait for Menlo to finish loading before measuring scrollWidth — font
-      // load changes character advance widths and invalidates earlier measurements.
-      document.fonts.load('12px Menlo').then(function() {
-        requestAnimationFrame(demoFit);
-      });
-    });
-  }
-
-  window.demoFit = demoFit;
-  window.demoReset = demoReset;
-  window.demoZoom = demoZoom;
-
-  function onDown(e) {
-    pointers[e.pointerId] = {x: e.clientX, y: e.clientY};
-    vp.setPointerCapture(e.pointerId);
-    var pts = Object.values(pointers);
-    if (pts.length === 1) { lastPX = e.clientX; lastPY = e.clientY; }
-    lastDist = null; lastMX = null; lastMY = null;
-  }
-
-  function onMove(e) {
-    if (!pointers[e.pointerId]) return;
-    pointers[e.pointerId] = {x: e.clientX, y: e.clientY};
-    var pts = Object.values(pointers);
-    if (pts.length >= 2) {
-      var dx = pts[0].x - pts[1].x, dy = pts[0].y - pts[1].y;
-      var dist = Math.sqrt(dx*dx + dy*dy);
-      var mx = (pts[0].x + pts[1].x) / 2, my = (pts[0].y + pts[1].y) / 2;
-      if (lastDist !== null) {
-        var r = vp.getBoundingClientRect();
-        // Unified formula: zoom around new midpoint, anchor content under old midpoint.
-        // When dist unchanged this reduces to pure translation; when midpoint unchanged
-        // it reduces to pure zoom. 30% sensitivity reduction on pinch delta.
-        var dampedRatio = 1 + (dist / lastDist - 1) * 0.7;
-        var ns = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * dampedRatio));
-        var px = mx - r.left, py = my - r.top;
-        var lpx = lastMX - r.left, lpy = lastMY - r.top;
-        tx = px - (lpx - tx) * (ns / scale);
-        ty = py - (lpy - ty) * (ns / scale);
-        scale = ns; applyTransform();
+  <script>
+    (function () {
+      function makeCanvas(w, h) {
+        var c = document.createElement("canvas");
+        c.width = w;
+        c.height = h;
+        return c;
       }
-      lastDist = dist; lastMX = mx; lastMY = my; lastPX = null;
-    } else if (pts.length === 1 && lastPX !== null) {
-      tx += e.clientX - lastPX; ty += e.clientY - lastPY;
-      lastPX = e.clientX; lastPY = e.clientY;
-      applyTransform(); lastDist = null;
-    }
-  }
 
-  function onUp(e) {
-    delete pointers[e.pointerId];
-    var pts = Object.values(pointers);
-    if (pts.length < 2) { lastDist = null; lastMX = null; lastMY = null; }
-    if (pts.length === 0) { lastPX = null; lastPY = null; }
-  }
-
-  vp = document.getElementById('demo-viewport');
-  tr = document.getElementById('demo-transform');
-  pre = document.getElementById('demo-pre');
-  img = document.getElementById('demo-img');
-
-  vp.addEventListener('pointerdown', onDown);
-  vp.addEventListener('pointermove', onMove);
-  vp.addEventListener('pointerup', onUp);
-  vp.addEventListener('pointercancel', onUp);
-  vp.addEventListener('wheel', function(e) {
-    e.preventDefault();
-    if (e.ctrlKey) {
-      // pinch-to-zoom (Mac trackpad pinch or ctrl+scroll)
-      var factor = e.deltaY < 0 ? 1.07 : 0.93;
-      var r = vp.getBoundingClientRect();
-      var px = e.clientX - r.left, py = e.clientY - r.top;
-      var ns = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * factor));
-      tx = px - (px - tx) * (ns / scale);
-      ty = py - (py - ty) * (ns / scale);
-      scale = ns;
-    } else {
-      // two-finger swipe → pan
-      tx -= e.deltaX;
-      ty -= e.deltaY;
-    }
-    applyTransform();
-  }, {passive: false});
-
-  window.addEventListener('load', function() {
-    loadText('output/greedy_iou_insta2_ww0/flandre35_visualization.txt');
-  });
-
-  // TXT links open in the viewer instead of navigating away
-  document.querySelectorAll('#tab-txt a[href$=".txt"]').forEach(function(a) {
-    a.addEventListener('click', function(e) {
-      e.preventDefault();
-      loadText(a.href);
-    });
-  });
-})();
-</script>
-<script>
-(function() {
-  if (typeof LiteGraph === 'undefined' || typeof LGraphCanvas === 'undefined') {
-    return;
-  }
-
-  function makeCanvas(w, h) {
-    var c = document.createElement('canvas');
-    c.width = w;
-    c.height = h;
-    return c;
-  }
-
-  function cloneImageCanvas(src) {
-    var c = makeCanvas(src.width, src.height);
-    c.getContext('2d').drawImage(src, 0, 0);
-    return c;
-  }
-
-  function canvasFromElement(el) {
-    var c = makeCanvas(el.naturalWidth || el.width, el.naturalHeight || el.height);
-    c.getContext('2d').drawImage(el, 0, 0);
-    return c;
-  }
-
-  function toGreyscaleCanvas(srcCanvas) {
-    var out = cloneImageCanvas(srcCanvas);
-    var ctx = out.getContext('2d');
-    var img = ctx.getImageData(0, 0, out.width, out.height);
-    var d = img.data;
-    for (var i = 0; i < d.length; i += 4) {
-      var g = Math.round(0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]);
-      d[i] = g;
-      d[i + 1] = g;
-      d[i + 2] = g;
-    }
-    ctx.putImageData(img, 0, 0);
-    out._mode = 'gray';
-    return out;
-  }
-
-  function toThresholdCanvas(grayCanvas, threshold) {
-    var out = cloneImageCanvas(grayCanvas);
-    var ctx = out.getContext('2d');
-    var img = ctx.getImageData(0, 0, out.width, out.height);
-    var d = img.data;
-    for (var i = 0; i < d.length; i += 4) {
-      var v = d[i] < threshold ? 0 : 255;
-      d[i] = v;
-      d[i + 1] = v;
-      d[i + 2] = v;
-    }
-    ctx.putImageData(img, 0, 0);
-    out._mode = 'binary';
-    return out;
-  }
-
-  function cannyFallback(srcCanvas, low, high) {
-    var gray = toGreyscaleCanvas(srcCanvas);
-    var w = gray.width;
-    var h = gray.height;
-    var gctx = gray.getContext('2d');
-    var gimg = gctx.getImageData(0, 0, w, h);
-    var d = gimg.data;
-    var out = makeCanvas(w, h);
-    var octx = out.getContext('2d');
-    var oimg = octx.createImageData(w, h);
-    var od = oimg.data;
-
-    function p(x, y) {
-      var idx = (y * w + x) * 4;
-      return d[idx];
-    }
-
-    for (var y = 1; y < h - 1; y++) {
-      for (var x = 1; x < w - 1; x++) {
-        var gx =
-          -p(x - 1, y - 1) + p(x + 1, y - 1) +
-          -2 * p(x - 1, y) + 2 * p(x + 1, y) +
-          -p(x - 1, y + 1) + p(x + 1, y + 1);
-        var gy =
-          -p(x - 1, y - 1) - 2 * p(x, y - 1) - p(x + 1, y - 1) +
-          p(x - 1, y + 1) + 2 * p(x, y + 1) + p(x + 1, y + 1);
-        var mag = Math.sqrt(gx * gx + gy * gy);
-        var v = mag >= high ? 255 : (mag >= low ? 140 : 0);
-        var idx2 = (y * w + x) * 4;
-        od[idx2] = v;
-        od[idx2 + 1] = v;
-        od[idx2 + 2] = v;
-        od[idx2 + 3] = 255;
+      function canvasFromElement(el) {
+        var c = makeCanvas(el.naturalWidth || el.width, el.naturalHeight || el.height);
+        c.getContext("2d").drawImage(el, 0, 0);
+        return c;
       }
-    }
-    octx.putImageData(oimg, 0, 0);
-    out._mode = 'edge';
-    return out;
-  }
 
-  function runCanny(srcCanvas, low, high) {
-    if (window.cv && cv.Mat) {
-      var src = cv.imread(srcCanvas);
-      var gray = new cv.Mat();
-      var edges = new cv.Mat();
-      cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-      cv.Canny(gray, edges, low, high);
-      var out = makeCanvas(srcCanvas.width, srcCanvas.height);
-      cv.imshow(out, edges);
-      src.delete();
-      gray.delete();
-      edges.delete();
-      out._mode = 'edge';
-      return out;
-    }
-    return cannyFallback(srcCanvas, low, high);
-  }
-
-  function drawPreview(ctx, canvas, w, h) {
-    if (!canvas) return;
-    var pad = 6;
-    var maxW = w - pad * 2;
-    var maxH = h - pad * 2;
-    if (maxW <= 0 || maxH <= 0) return;
-    var scale = Math.min(maxW / canvas.width, maxH / canvas.height);
-    var dw = Math.max(1, Math.floor(canvas.width * scale));
-    var dh = Math.max(1, Math.floor(canvas.height * scale));
-    var dx = Math.floor((w - dw) / 2);
-    var dy = Math.floor((h - dh) / 2);
-    ctx.drawImage(canvas, dx, dy, dw, dh);
-  }
-
-  function ImageNode() {
-    this.title = 'Image';
-    this.size = [260, 220];
-    this.addOutput('image', 'image');
-    this.fileName = '';
-    this.imageCanvas = null;
-    this.addWidget('button', 'load png', null, this.pickFile.bind(this));
-  }
-  ImageNode.title = 'Image';
-  ImageNode.prototype.pickFile = function() {
-    var input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/png,image/*';
-    var self = this;
-    input.onchange = function() {
-      if (input.files && input.files[0]) {
-        self.loadFromFile(input.files[0]);
+      function cloneCanvas(src) {
+        var c = makeCanvas(src.width, src.height);
+        c.getContext("2d").drawImage(src, 0, 0);
+        return c;
       }
-    };
-    input.click();
-  };
-  ImageNode.prototype.loadFromFile = function(file) {
-    var self = this;
-    var reader = new FileReader();
-    reader.onload = function() {
-      var img = new Image();
-      img.onload = function() {
-        self.imageCanvas = canvasFromElement(img);
-        self.fileName = file.name;
-        self.setDirtyCanvas(true, true);
+
+      function toGreyscaleCanvas(src) {
+        var out = cloneCanvas(src);
+        var ctx = out.getContext("2d");
+        var img = ctx.getImageData(0, 0, out.width, out.height);
+        var d = img.data;
+        for (var i = 0; i < d.length; i += 4) {
+          var g = Math.round(0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]);
+          d[i] = g;
+          d[i + 1] = g;
+          d[i + 2] = g;
+        }
+        ctx.putImageData(img, 0, 0);
+        out._mode = "gray";
+        return out;
+      }
+
+      function thresholdCanvas(gray, threshold) {
+        var out = cloneCanvas(gray);
+        var ctx = out.getContext("2d");
+        var img = ctx.getImageData(0, 0, out.width, out.height);
+        var d = img.data;
+        for (var i = 0; i < d.length; i += 4) {
+          var v = d[i] < threshold ? 0 : 255;
+          d[i] = v;
+          d[i + 1] = v;
+          d[i + 2] = v;
+        }
+        ctx.putImageData(img, 0, 0);
+        out._mode = "binary";
+        return out;
+      }
+
+      function drawPreview(ctx, preview, w, h) {
+        if (!preview) return;
+        var pad = 6;
+        var maxW = Math.max(1, w - pad * 2);
+        var maxH = Math.max(1, h - pad * 2);
+        var s = Math.min(maxW / preview.width, maxH / preview.height);
+        var dw = Math.max(1, Math.floor(preview.width * s));
+        var dh = Math.max(1, Math.floor(preview.height * s));
+        var dx = Math.floor((w - dw) / 2);
+        var dy = Math.floor((h - dh) / 2);
+        ctx.drawImage(preview, dx, dy, dw, dh);
+      }
+
+      function cannyFallback(srcCanvas, low, high) {
+        var gray = toGreyscaleCanvas(srcCanvas);
+        var w = gray.width;
+        var h = gray.height;
+        var gctx = gray.getContext("2d");
+        var gimg = gctx.getImageData(0, 0, w, h);
+        var d = gimg.data;
+        var out = makeCanvas(w, h);
+        var octx = out.getContext("2d");
+        var oimg = octx.createImageData(w, h);
+        var od = oimg.data;
+
+        function p(x, y) {
+          return d[(y * w + x) * 4];
+        }
+
+        for (var y = 1; y < h - 1; y++) {
+          for (var x = 1; x < w - 1; x++) {
+            var gx =
+              -p(x - 1, y - 1) + p(x + 1, y - 1) +
+              -2 * p(x - 1, y) + 2 * p(x + 1, y) +
+              -p(x - 1, y + 1) + p(x + 1, y + 1);
+            var gy =
+              -p(x - 1, y - 1) - 2 * p(x, y - 1) - p(x + 1, y - 1) +
+              p(x - 1, y + 1) + 2 * p(x, y + 1) + p(x + 1, y + 1);
+            var mag = Math.sqrt(gx * gx + gy * gy);
+            var v = mag >= high ? 255 : (mag >= low ? 130 : 0);
+            var idx = (y * w + x) * 4;
+            od[idx] = v;
+            od[idx + 1] = v;
+            od[idx + 2] = v;
+            od[idx + 3] = 255;
+          }
+        }
+        octx.putImageData(oimg, 0, 0);
+        out._mode = "edge";
+        return out;
+      }
+
+      function runCanny(srcCanvas, low, high) {
+        if (window.cv && cv.Mat) {
+          var src = cv.imread(srcCanvas);
+          var gray = new cv.Mat();
+          var edges = new cv.Mat();
+          cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+          cv.Canny(gray, edges, low, high);
+          var out = makeCanvas(srcCanvas.width, srcCanvas.height);
+          cv.imshow(out, edges);
+          src.delete();
+          gray.delete();
+          edges.delete();
+          out._mode = "edge";
+          return out;
+        }
+        return cannyFallback(srcCanvas, low, high);
+      }
+
+      function ImageNode() {
+        this.title = "Image";
+        this.size = [210, 160];
+        this.addOutput("image", "image");
+        this.preview = null;
+        this.fileName = "";
+        this.addWidget("button", "load image", null, this.pickFile.bind(this));
+      }
+      ImageNode.title = "Image";
+      ImageNode.prototype.pickFile = function () {
+        var input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/png,image/*";
+        var self = this;
+        input.onchange = function () {
+          if (input.files && input.files[0]) self.loadFromFile(input.files[0]);
+        };
+        input.click();
       };
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
-  };
-  ImageNode.prototype.onExecute = function() {
-    this.setOutputData(0, this.imageCanvas);
-  };
-  ImageNode.prototype.onDrawBackground = function(ctx) {
-    if (!this.imageCanvas || this.flags.collapsed) return;
-    drawPreview(ctx, this.imageCanvas, this.size[0], this.size[1] - 30);
-  };
-  ImageNode.prototype.onDrawForeground = function(ctx) {
-    if (!this.fileName || this.flags.collapsed) return;
-    ctx.fillStyle = '#ddd';
-    ctx.font = '11px monospace';
-    ctx.fillText(this.fileName, 6, this.size[1] - 8);
-  };
+      ImageNode.prototype.loadFromFile = function (file) {
+        var self = this;
+        var fr = new FileReader();
+        fr.onload = function () {
+          var img = new Image();
+          img.onload = function () {
+            self.preview = canvasFromElement(img);
+            self.fileName = file.name;
+            self.setDirtyCanvas(true, true);
+          };
+          img.src = fr.result;
+        };
+        fr.readAsDataURL(file);
+      };
+      ImageNode.prototype.onExecute = function () {
+        this.setOutputData(0, this.preview);
+      };
+      ImageNode.prototype.onDrawBackground = function (ctx) {
+        if (!this.preview || this.flags.collapsed) return;
+        drawPreview(ctx, this.preview, this.size[0], this.size[1] - 28);
+      };
+      ImageNode.prototype.onDrawForeground = function (ctx) {
+        if (!this.fileName || this.flags.collapsed) return;
+        ctx.fillStyle = "#d9d9d9";
+        ctx.font = "10px monospace";
+        ctx.fillText(this.fileName.slice(0, 28), 6, this.size[1] - 8);
+      };
 
-  function LookNode() {
-    this.title = 'Look';
-    this.size = [300, 240];
-    this.addInput('in', 0);
-    this.lastImage = null;
-    this.lastText = '';
-  }
-  LookNode.title = 'Look';
-  LookNode.prototype.onExecute = function() {
-    var data = this.getInputData(0);
-    this.lastImage = null;
-    this.lastText = '';
-    if (!data) return;
-    if (typeof data === 'string') {
-      this.lastText = data;
-    } else if (data instanceof HTMLCanvasElement) {
-      this.lastImage = data;
-    }
-  };
-  LookNode.prototype.onDrawBackground = function(ctx) {
-    if (this.flags.collapsed) return;
-    if (this.lastImage) {
-      drawPreview(ctx, this.lastImage, this.size[0], this.size[1] - 26);
-      return;
-    }
-    if (this.lastText) {
-      ctx.fillStyle = '#e9e9e9';
-      ctx.font = '11px monospace';
-      var lines = this.lastText.split('\n').slice(0, 10);
-      for (var i = 0; i < lines.length; i++) {
-        ctx.fillText(lines[i].slice(0, 42), 8, 28 + i * 13);
+      function LookNode() {
+        this.title = "Look";
+        this.size = [240, 180];
+        this.addInput("in", 0);
+        this.preview = null;
+        this.previewText = "";
       }
-    }
-  };
+      LookNode.title = "Look";
+      LookNode.prototype.onExecute = function () {
+        var data = this.getInputData(0);
+        this.preview = null;
+        this.previewText = "";
+        if (!data) return;
+        if (typeof data === "string") this.previewText = data;
+        else if (data instanceof HTMLCanvasElement) this.preview = data;
+      };
+      LookNode.prototype.onDrawBackground = function (ctx) {
+        if (this.flags.collapsed) return;
+        if (this.preview) {
+          drawPreview(ctx, this.preview, this.size[0], this.size[1] - 20);
+          return;
+        }
+        if (this.previewText) {
+          ctx.fillStyle = "#ddd";
+          ctx.font = "10px monospace";
+          var lines = this.previewText.split("\n").slice(0, 8);
+          for (var i = 0; i < lines.length; i++) {
+            ctx.fillText(lines[i].slice(0, 32), 8, 26 + i * 12);
+          }
+        }
+      };
 
-  function CenterCropNode() {
-    this.title = 'CenterCrop';
-    this.size = [260, 120];
-    this.addInput('image', 'image');
-    this.addOutput('image', 'image');
-    this.cellW = 7;
-    this.cellH = 15;
-    this.addWidget('number', 'cell width', this.cellW, function(v) { this.cellW = Math.max(1, Math.floor(v)); }.bind(this), {step: 1, min: 1});
-    this.addWidget('number', 'cell height', this.cellH, function(v) { this.cellH = Math.max(1, Math.floor(v)); }.bind(this), {step: 1, min: 1});
-  }
-  CenterCropNode.title = 'CenterCrop';
-  CenterCropNode.prototype.onExecute = function() {
-    var src = this.getInputData(0);
-    if (!(src instanceof HTMLCanvasElement)) {
-      this.setOutputData(0, null);
-      return;
-    }
-    var w = src.width;
-    var h = src.height;
-    var cw = Math.max(1, this.cellW | 0);
-    var ch = Math.max(1, this.cellH | 0);
-    var outW = Math.max(cw, Math.floor(w / cw) * cw);
-    var outH = Math.max(ch, Math.floor(h / ch) * ch);
-    var sx = Math.floor((w - outW) / 2);
-    var sy = Math.floor((h - outH) / 2);
-    var out = makeCanvas(outW, outH);
-    out.getContext('2d').drawImage(src, sx, sy, outW, outH, 0, 0, outW, outH);
-    this.setOutputData(0, out);
-  };
+      function CenterCropNode() {
+        this.title = "CenterCrop";
+        this.size = [220, 100];
+        this.addInput("image", "image");
+        this.addOutput("image", "image");
+        this.cellW = 7;
+        this.cellH = 15;
+        this.addWidget("number", "cell width", this.cellW, function (v) { this.cellW = Math.max(1, Math.floor(v)); }.bind(this), { step: 1, min: 1 });
+        this.addWidget("number", "cell height", this.cellH, function (v) { this.cellH = Math.max(1, Math.floor(v)); }.bind(this), { step: 1, min: 1 });
+      }
+      CenterCropNode.title = "CenterCrop";
+      CenterCropNode.prototype.onExecute = function () {
+        var src = this.getInputData(0);
+        if (!(src instanceof HTMLCanvasElement)) return this.setOutputData(0, null);
+        var cw = Math.max(1, this.cellW | 0);
+        var ch = Math.max(1, this.cellH | 0);
+        var outW = Math.max(cw, Math.floor(src.width / cw) * cw);
+        var outH = Math.max(ch, Math.floor(src.height / ch) * ch);
+        var sx = Math.floor((src.width - outW) / 2);
+        var sy = Math.floor((src.height - outH) / 2);
+        var out = makeCanvas(outW, outH);
+        out.getContext("2d").drawImage(src, sx, sy, outW, outH, 0, 0, outW, outH);
+        this.setOutputData(0, out);
+      };
 
-  function TextNode() {
-    this.title = 'Text';
-    this.size = [300, 150];
-    this.addOutput('text', 'text');
-    this.text = '';
-    this.addWidget('text', 'value', this.text, function(v) { this.text = String(v || ''); }.bind(this));
-  }
-  TextNode.title = 'Text';
-  TextNode.prototype.onExecute = function() {
-    this.setOutputData(0, this.text);
-  };
+      function TextNode() {
+        this.title = "Text";
+        this.size = [240, 115];
+        this.addOutput("text", "text");
+        this.value = "";
+        this.addWidget("text", "value", this.value, function (v) { this.value = String(v || ""); }.bind(this));
+      }
+      TextNode.title = "Text";
+      TextNode.prototype.onExecute = function () { this.setOutputData(0, this.value); };
 
-  function GreyscaleNode() {
-    this.title = 'Greyscale';
-    this.size = [190, 80];
-    this.addInput('rgb image', 'image');
-    this.addOutput('gray image', 'image');
-  }
-  GreyscaleNode.title = 'Greyscale';
-  GreyscaleNode.prototype.onExecute = function() {
-    var src = this.getInputData(0);
-    if (!(src instanceof HTMLCanvasElement)) {
-      this.setOutputData(0, null);
-      return;
-    }
-    this.setOutputData(0, toGreyscaleCanvas(src));
-  };
+      function GreyscaleNode() {
+        this.title = "Greyscale";
+        this.size = [170, 70];
+        this.addInput("rgb image", "image");
+        this.addOutput("gray image", "image");
+      }
+      GreyscaleNode.title = "Greyscale";
+      GreyscaleNode.prototype.onExecute = function () {
+        var src = this.getInputData(0);
+        this.setOutputData(0, src instanceof HTMLCanvasElement ? toGreyscaleCanvas(src) : null);
+      };
 
-  function ThresholdNode() {
-    this.title = 'Threshold';
-    this.size = [280, 120];
-    this.addInput('gray image', 'image');
-    this.addOutput('binary image', 'image');
-    this.threshold = 128;
-    this.addWidget('slider', 'threshold', this.threshold, function(v) {
-      this.threshold = Math.max(0, Math.min(255, Math.round(v)));
-    }.bind(this), {min: 0, max: 255, step: 1});
-  }
-  ThresholdNode.title = 'Threshold';
-  ThresholdNode.prototype.onExecute = function() {
-    var src = this.getInputData(0);
-    if (!(src instanceof HTMLCanvasElement)) {
-      this.setOutputData(0, null);
-      return;
-    }
-    if (src._mode && src._mode !== 'gray') {
-      this.setOutputData(0, null);
-      return;
-    }
-    this.setOutputData(0, toThresholdCanvas(src, this.threshold));
-  };
+      function ThresholdNode() {
+        this.title = "Threshold";
+        this.size = [230, 95];
+        this.addInput("gray image", "image");
+        this.addOutput("binary image", "image");
+        this.threshold = 128;
+        this.addWidget("slider", "threshold", this.threshold, function (v) {
+          this.threshold = Math.max(0, Math.min(255, Math.round(v)));
+        }.bind(this), { min: 0, max: 255, step: 1 });
+      }
+      ThresholdNode.title = "Threshold";
+      ThresholdNode.prototype.onExecute = function () {
+        var src = this.getInputData(0);
+        if (!(src instanceof HTMLCanvasElement)) return this.setOutputData(0, null);
+        if (src._mode && src._mode !== "gray") return this.setOutputData(0, null);
+        this.setOutputData(0, thresholdCanvas(src, this.threshold));
+      };
 
-  function CannyNode() {
-    this.title = 'Canny-Edge';
-    this.size = [280, 140];
-    this.addInput('image', 'image');
-    this.addOutput('edges', 'image');
-    this.low = 80;
-    this.high = 160;
-    this.addWidget('slider', 'low', this.low, function(v) {
-      this.low = Math.max(0, Math.min(255, Math.round(v)));
-    }.bind(this), {min: 0, max: 255, step: 1});
-    this.addWidget('slider', 'high', this.high, function(v) {
-      this.high = Math.max(0, Math.min(255, Math.round(v)));
-    }.bind(this), {min: 0, max: 255, step: 1});
-  }
-  CannyNode.title = 'Canny-Edge';
-  CannyNode.prototype.onExecute = function() {
-    var src = this.getInputData(0);
-    if (!(src instanceof HTMLCanvasElement)) {
-      this.setOutputData(0, null);
-      return;
-    }
-    var low = Math.min(this.low, this.high);
-    var high = Math.max(this.low, this.high);
-    this.setOutputData(0, runCanny(src, low, high));
-  };
+      function CannyNode() {
+        this.title = "Canny-Edge";
+        this.size = [230, 110];
+        this.addInput("image", "image");
+        this.addOutput("edges", "image");
+        this.low = 80;
+        this.high = 160;
+        this.addWidget("slider", "low", this.low, function (v) { this.low = Math.max(0, Math.min(255, Math.round(v))); }.bind(this), { min: 0, max: 255, step: 1 });
+        this.addWidget("slider", "high", this.high, function (v) { this.high = Math.max(0, Math.min(255, Math.round(v))); }.bind(this), { min: 0, max: 255, step: 1 });
+      }
+      CannyNode.title = "Canny-Edge";
+      CannyNode.prototype.onExecute = function () {
+        var src = this.getInputData(0);
+        if (!(src instanceof HTMLCanvasElement)) return this.setOutputData(0, null);
+        var low = Math.min(this.low, this.high);
+        var high = Math.max(this.low, this.high);
+        this.setOutputData(0, runCanny(src, low, high));
+      };
 
-  LiteGraph.registerNodeType('ascii/image', ImageNode);
-  LiteGraph.registerNodeType('ascii/look', LookNode);
-  LiteGraph.registerNodeType('ascii/centercrop', CenterCropNode);
-  LiteGraph.registerNodeType('ascii/text', TextNode);
-  LiteGraph.registerNodeType('ascii/greyscale', GreyscaleNode);
-  LiteGraph.registerNodeType('ascii/threshold', ThresholdNode);
-  LiteGraph.registerNodeType('ascii/canny', CannyNode);
+      LiteGraph.registerNodeType("ascii/image", ImageNode);
+      LiteGraph.registerNodeType("ascii/look", LookNode);
+      LiteGraph.registerNodeType("ascii/centercrop", CenterCropNode);
+      LiteGraph.registerNodeType("ascii/text", TextNode);
+      LiteGraph.registerNodeType("ascii/greyscale", GreyscaleNode);
+      LiteGraph.registerNodeType("ascii/threshold", ThresholdNode);
+      LiteGraph.registerNodeType("ascii/canny", CannyNode);
 
-  var graphCanvas = document.getElementById('node-canvas');
-  if (!graphCanvas) return;
-  var graph = new LGraph();
-  var canvas = new LGraphCanvas(graphCanvas, graph);
-  canvas.background_image = null;
-  graph.start();
+      var graph = new LGraph();
+      var graphCanvasEl = document.getElementById("graph");
+      var graphCanvas = new LGraphCanvas(graphCanvasEl, graph);
+      var wrap = document.getElementById("canvas-wrap");
 
-  function addNode(type, x, y) {
-    var node = LiteGraph.createNode(type);
-    if (!node) return null;
-    node.pos = [x || 120, y || 120];
-    graph.add(node);
-    return node;
-  }
+      function resizeCanvasToContainer() {
+        graphCanvasEl.width = wrap.clientWidth;
+        graphCanvasEl.height = wrap.clientHeight;
+        graphCanvas.resize();
+      }
+      window.addEventListener("resize", resizeCanvasToContainer);
+      resizeCanvasToContainer();
 
-  function seedGraph() {
-    var img = addNode('ascii/image', 80, 120);
-    var crop = addNode('ascii/centercrop', 380, 120);
-    var gray = addNode('ascii/greyscale', 690, 120);
-    var thr = addNode('ascii/threshold', 930, 120);
-    var look = addNode('ascii/look', 1260, 120);
-    if (img && crop && gray && thr && look) {
-      img.connect(0, crop, 0);
-      crop.connect(0, gray, 0);
-      gray.connect(0, thr, 0);
-      thr.connect(0, look, 0);
-    }
-  }
-  seedGraph();
+      graphCanvas.ds.scale = 0.75;
+      graphCanvas.ds.offset = [70, 60];
+      graphCanvas.setDirty(true, true);
+      graph.start();
 
-  document.querySelectorAll('[data-add-node]').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      addNode(btn.getAttribute('data-add-node'), 200 + Math.random() * 280, 160 + Math.random() * 260);
-    });
-  });
+      function addNode(type, x, y) {
+        var node = LiteGraph.createNode(type);
+        if (!node) return null;
+        node.pos = [x || 90, y || 90];
+        graph.add(node);
+        return node;
+      }
 
-  function firstImageNode() {
-    var nodes = graph._nodes || [];
-    for (var i = 0; i < nodes.length; i++) {
-      if (nodes[i] instanceof ImageNode) return nodes[i];
-    }
-    return null;
-  }
+      function firstImageNode() {
+        var nodes = graph._nodes || [];
+        for (var i = 0; i < nodes.length; i++) {
+          if (nodes[i] instanceof ImageNode) return nodes[i];
+        }
+        return null;
+      }
 
-  var wrap = document.getElementById('node-canvas-wrap');
-  wrap.addEventListener('dragover', function(e) { e.preventDefault(); });
-  wrap.addEventListener('drop', function(e) {
-    e.preventDefault();
-    if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files[0]) return;
-    var file = e.dataTransfer.files[0];
-    if (!file.type || file.type.indexOf('image/') !== 0) return;
-    var node = firstImageNode() || addNode('ascii/image', 120, 120);
-    node.loadFromFile(file);
-  });
+      document.querySelectorAll("[data-add-node]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          addNode(btn.getAttribute("data-add-node"), 140 + Math.random() * 200, 100 + Math.random() * 180);
+        });
+      });
 
-  (function loadOpenCV() {
-    var s = document.createElement('script');
-    s.src = 'https://docs.opencv.org/4.10.0/opencv.js';
-    s.async = true;
-    document.head.appendChild(s);
-  })();
-})();
-</script>
+      document.getElementById("btn-reset-view").addEventListener("click", function () {
+        graphCanvas.ds.scale = 0.75;
+        graphCanvas.ds.offset = [70, 60];
+        graphCanvas.setDirty(true, true);
+      });
+
+      var img = addNode("ascii/image", 80, 110);
+      var crop = addNode("ascii/centercrop", 330, 110);
+      var gray = addNode("ascii/greyscale", 590, 110);
+      var thr = addNode("ascii/threshold", 800, 110);
+      var look = addNode("ascii/look", 1080, 110);
+      if (img && crop && gray && thr && look) {
+        img.connect(0, crop, 0);
+        crop.connect(0, gray, 0);
+        gray.connect(0, thr, 0);
+        thr.connect(0, look, 0);
+      }
+
+      wrap.addEventListener("dragover", function (e) { e.preventDefault(); });
+      wrap.addEventListener("drop", function (e) {
+        e.preventDefault();
+        var file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (!file || !file.type || file.type.indexOf("image/") !== 0) return;
+        var node = firstImageNode() || addNode("ascii/image", 80, 110);
+        node.loadFromFile(file);
+      });
+
+      (function loadOpenCV() {
+        var s = document.createElement("script");
+        s.src = "https://docs.opencv.org/4.10.0/opencv.js";
+        s.async = true;
+        document.head.appendChild(s);
+      })();
+    })();
+  </script>
 </body>
 </html>
