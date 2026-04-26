@@ -1,8 +1,8 @@
-# 8 methods: insta/insta2 × ww3/ww5 × percentile 25/60
+# 20 methods: insta/insta2 × ww3/ww5 × percentile 40..60 in steps of 5
 # percentile in misc_args takes priority over image sidecar value
 
 methods:
-  - name: "insta_ww3_p25"
+  - name: "insta_ww3_p40"
     method: "greedy_iou_white_weighted"
     scale: 0.5
     misc_args:
@@ -10,7 +10,37 @@ methods:
       char_width: 7
       char_height: 15
       white_weight: 3
-      percentile: 25
+      percentile: 40
+
+  - name: "insta_ww3_p45"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta"
+      char_width: 7
+      char_height: 15
+      white_weight: 3
+      percentile: 45
+
+  - name: "insta_ww3_p50"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta"
+      char_width: 7
+      char_height: 15
+      white_weight: 3
+      percentile: 50
+
+  - name: "insta_ww3_p55"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta"
+      char_width: 7
+      char_height: 15
+      white_weight: 3
+      percentile: 55
 
   - name: "insta_ww3_p60"
     method: "greedy_iou_white_weighted"
@@ -22,7 +52,7 @@ methods:
       white_weight: 3
       percentile: 60
 
-  - name: "insta_ww5_p25"
+  - name: "insta_ww5_p40"
     method: "greedy_iou_white_weighted"
     scale: 0.5
     misc_args:
@@ -30,7 +60,37 @@ methods:
       char_width: 7
       char_height: 15
       white_weight: 5
-      percentile: 25
+      percentile: 40
+
+  - name: "insta_ww5_p45"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta"
+      char_width: 7
+      char_height: 15
+      white_weight: 5
+      percentile: 45
+
+  - name: "insta_ww5_p50"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta"
+      char_width: 7
+      char_height: 15
+      white_weight: 5
+      percentile: 50
+
+  - name: "insta_ww5_p55"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta"
+      char_width: 7
+      char_height: 15
+      white_weight: 5
+      percentile: 55
 
   - name: "insta_ww5_p60"
     method: "greedy_iou_white_weighted"
@@ -42,7 +102,7 @@ methods:
       white_weight: 5
       percentile: 60
 
-  - name: "insta2_ww3_p25"
+  - name: "insta2_ww3_p40"
     method: "greedy_iou_white_weighted"
     scale: 0.5
     misc_args:
@@ -50,7 +110,37 @@ methods:
       char_width: 7
       char_height: 15
       white_weight: 3
-      percentile: 25
+      percentile: 40
+
+  - name: "insta2_ww3_p45"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta2"
+      char_width: 7
+      char_height: 15
+      white_weight: 3
+      percentile: 45
+
+  - name: "insta2_ww3_p50"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta2"
+      char_width: 7
+      char_height: 15
+      white_weight: 3
+      percentile: 50
+
+  - name: "insta2_ww3_p55"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta2"
+      char_width: 7
+      char_height: 15
+      white_weight: 3
+      percentile: 55
 
   - name: "insta2_ww3_p60"
     method: "greedy_iou_white_weighted"
@@ -62,7 +152,7 @@ methods:
       white_weight: 3
       percentile: 60
 
-  - name: "insta2_ww5_p25"
+  - name: "insta2_ww5_p40"
     method: "greedy_iou_white_weighted"
     scale: 0.5
     misc_args:
@@ -70,7 +160,37 @@ methods:
       char_width: 7
       char_height: 15
       white_weight: 5
-      percentile: 25
+      percentile: 40
+
+  - name: "insta2_ww5_p45"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta2"
+      char_width: 7
+      char_height: 15
+      white_weight: 5
+      percentile: 45
+
+  - name: "insta2_ww5_p50"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta2"
+      char_width: 7
+      char_height: 15
+      white_weight: 5
+      percentile: 50
+
+  - name: "insta2_ww5_p55"
+    method: "greedy_iou_white_weighted"
+    scale: 0.5
+    misc_args:
+      char_set: "insta2"
+      char_width: 7
+      char_height: 15
+      white_weight: 5
+      percentile: 55
 
   - name: "insta2_ww5_p60"
     method: "greedy_iou_white_weighted"
