@@ -16,7 +16,47 @@ h2{margin:1.5rem 0 0.3rem}
 .tabs button.active{font-weight:bold;text-decoration:underline}
 .tab{display:none}
 .tab.active{display:block}
+#tab-nodegraph {
+  height: calc(100vh - 120px);
+}
+#nodegraph-ui {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+}
+#node-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+}
+#node-toolbar button {
+  padding: 0.2rem 0.6rem;
+  cursor: pointer;
+  font-family: monospace;
+}
+#node-hint {
+  margin-left: 0.5rem;
+  color: #444;
+}
+#node-canvas-wrap {
+  position: relative;
+  flex: 1;
+  border: 1px solid #ddd;
+  background: #1e1e1e;
+}
+#node-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litegraph.js@0.7.18/css/litegraph.css">
+<script src="https://cdn.jsdelivr.net/npm/litegraph.js@0.7.18/build/litegraph.min.js"></script>
 </head>
 <body>
 <h1>output/</h1>
@@ -24,6 +64,7 @@ h2{margin:1.5rem 0 0.3rem}
   <button class="active" onclick="switchTab('png',this)">PNG</button>
   <button onclick="switchTab('txt',this)">TXT</button>
   <button onclick="switchTab('demo',this)">Demo</button>
+  <button onclick="switchTab('nodegraph',this)">Node Graph</button>
 </div>
 
 <div id="tab-png" class="tab active">
@@ -452,6 +493,24 @@ h2{margin:1.5rem 0 0.3rem}
 </div>
 </div>
 
+<div id="tab-nodegraph" class="tab">
+  <div id="nodegraph-ui">
+    <div id="node-toolbar">
+      <button type="button" data-add-node="ascii/image">Image</button>
+      <button type="button" data-add-node="ascii/look">Look</button>
+      <button type="button" data-add-node="ascii/centercrop">CenterCrop</button>
+      <button type="button" data-add-node="ascii/text">Text</button>
+      <button type="button" data-add-node="ascii/greyscale">Greyscale</button>
+      <button type="button" data-add-node="ascii/threshold">Threshold</button>
+      <button type="button" data-add-node="ascii/canny">Canny-Edge</button>
+      <span id="node-hint">Drop a PNG onto the graph to feed the first Image node.</span>
+    </div>
+    <div id="node-canvas-wrap">
+      <canvas id="node-canvas"></canvas>
+    </div>
+  </div>
+</div>
+
 <script>
 
 function switchTab(name, btn) {
@@ -592,6 +651,398 @@ function switchTab(name, btn) {
       loadText(a.href);
     });
   });
+})();
+</script>
+<script>
+(function() {
+  if (typeof LiteGraph === 'undefined' || typeof LGraphCanvas === 'undefined') {
+    return;
+  }
+
+  function makeCanvas(w, h) {
+    var c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    return c;
+  }
+
+  function cloneImageCanvas(src) {
+    var c = makeCanvas(src.width, src.height);
+    c.getContext('2d').drawImage(src, 0, 0);
+    return c;
+  }
+
+  function canvasFromElement(el) {
+    var c = makeCanvas(el.naturalWidth || el.width, el.naturalHeight || el.height);
+    c.getContext('2d').drawImage(el, 0, 0);
+    return c;
+  }
+
+  function toGreyscaleCanvas(srcCanvas) {
+    var out = cloneImageCanvas(srcCanvas);
+    var ctx = out.getContext('2d');
+    var img = ctx.getImageData(0, 0, out.width, out.height);
+    var d = img.data;
+    for (var i = 0; i < d.length; i += 4) {
+      var g = Math.round(0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]);
+      d[i] = g;
+      d[i + 1] = g;
+      d[i + 2] = g;
+    }
+    ctx.putImageData(img, 0, 0);
+    out._mode = 'gray';
+    return out;
+  }
+
+  function toThresholdCanvas(grayCanvas, threshold) {
+    var out = cloneImageCanvas(grayCanvas);
+    var ctx = out.getContext('2d');
+    var img = ctx.getImageData(0, 0, out.width, out.height);
+    var d = img.data;
+    for (var i = 0; i < d.length; i += 4) {
+      var v = d[i] < threshold ? 0 : 255;
+      d[i] = v;
+      d[i + 1] = v;
+      d[i + 2] = v;
+    }
+    ctx.putImageData(img, 0, 0);
+    out._mode = 'binary';
+    return out;
+  }
+
+  function cannyFallback(srcCanvas, low, high) {
+    var gray = toGreyscaleCanvas(srcCanvas);
+    var w = gray.width;
+    var h = gray.height;
+    var gctx = gray.getContext('2d');
+    var gimg = gctx.getImageData(0, 0, w, h);
+    var d = gimg.data;
+    var out = makeCanvas(w, h);
+    var octx = out.getContext('2d');
+    var oimg = octx.createImageData(w, h);
+    var od = oimg.data;
+
+    function p(x, y) {
+      var idx = (y * w + x) * 4;
+      return d[idx];
+    }
+
+    for (var y = 1; y < h - 1; y++) {
+      for (var x = 1; x < w - 1; x++) {
+        var gx =
+          -p(x - 1, y - 1) + p(x + 1, y - 1) +
+          -2 * p(x - 1, y) + 2 * p(x + 1, y) +
+          -p(x - 1, y + 1) + p(x + 1, y + 1);
+        var gy =
+          -p(x - 1, y - 1) - 2 * p(x, y - 1) - p(x + 1, y - 1) +
+          p(x - 1, y + 1) + 2 * p(x, y + 1) + p(x + 1, y + 1);
+        var mag = Math.sqrt(gx * gx + gy * gy);
+        var v = mag >= high ? 255 : (mag >= low ? 140 : 0);
+        var idx2 = (y * w + x) * 4;
+        od[idx2] = v;
+        od[idx2 + 1] = v;
+        od[idx2 + 2] = v;
+        od[idx2 + 3] = 255;
+      }
+    }
+    octx.putImageData(oimg, 0, 0);
+    out._mode = 'edge';
+    return out;
+  }
+
+  function runCanny(srcCanvas, low, high) {
+    if (window.cv && cv.Mat) {
+      var src = cv.imread(srcCanvas);
+      var gray = new cv.Mat();
+      var edges = new cv.Mat();
+      cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+      cv.Canny(gray, edges, low, high);
+      var out = makeCanvas(srcCanvas.width, srcCanvas.height);
+      cv.imshow(out, edges);
+      src.delete();
+      gray.delete();
+      edges.delete();
+      out._mode = 'edge';
+      return out;
+    }
+    return cannyFallback(srcCanvas, low, high);
+  }
+
+  function drawPreview(ctx, canvas, w, h) {
+    if (!canvas) return;
+    var pad = 6;
+    var maxW = w - pad * 2;
+    var maxH = h - pad * 2;
+    if (maxW <= 0 || maxH <= 0) return;
+    var scale = Math.min(maxW / canvas.width, maxH / canvas.height);
+    var dw = Math.max(1, Math.floor(canvas.width * scale));
+    var dh = Math.max(1, Math.floor(canvas.height * scale));
+    var dx = Math.floor((w - dw) / 2);
+    var dy = Math.floor((h - dh) / 2);
+    ctx.drawImage(canvas, dx, dy, dw, dh);
+  }
+
+  function ImageNode() {
+    this.title = 'Image';
+    this.size = [260, 220];
+    this.addOutput('image', 'image');
+    this.fileName = '';
+    this.imageCanvas = null;
+    this.addWidget('button', 'load png', null, this.pickFile.bind(this));
+  }
+  ImageNode.title = 'Image';
+  ImageNode.prototype.pickFile = function() {
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/png,image/*';
+    var self = this;
+    input.onchange = function() {
+      if (input.files && input.files[0]) {
+        self.loadFromFile(input.files[0]);
+      }
+    };
+    input.click();
+  };
+  ImageNode.prototype.loadFromFile = function(file) {
+    var self = this;
+    var reader = new FileReader();
+    reader.onload = function() {
+      var img = new Image();
+      img.onload = function() {
+        self.imageCanvas = canvasFromElement(img);
+        self.fileName = file.name;
+        self.setDirtyCanvas(true, true);
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  ImageNode.prototype.onExecute = function() {
+    this.setOutputData(0, this.imageCanvas);
+  };
+  ImageNode.prototype.onDrawBackground = function(ctx) {
+    if (!this.imageCanvas || this.flags.collapsed) return;
+    drawPreview(ctx, this.imageCanvas, this.size[0], this.size[1] - 30);
+  };
+  ImageNode.prototype.onDrawForeground = function(ctx) {
+    if (!this.fileName || this.flags.collapsed) return;
+    ctx.fillStyle = '#ddd';
+    ctx.font = '11px monospace';
+    ctx.fillText(this.fileName, 6, this.size[1] - 8);
+  };
+
+  function LookNode() {
+    this.title = 'Look';
+    this.size = [300, 240];
+    this.addInput('in', 0);
+    this.lastImage = null;
+    this.lastText = '';
+  }
+  LookNode.title = 'Look';
+  LookNode.prototype.onExecute = function() {
+    var data = this.getInputData(0);
+    this.lastImage = null;
+    this.lastText = '';
+    if (!data) return;
+    if (typeof data === 'string') {
+      this.lastText = data;
+    } else if (data instanceof HTMLCanvasElement) {
+      this.lastImage = data;
+    }
+  };
+  LookNode.prototype.onDrawBackground = function(ctx) {
+    if (this.flags.collapsed) return;
+    if (this.lastImage) {
+      drawPreview(ctx, this.lastImage, this.size[0], this.size[1] - 26);
+      return;
+    }
+    if (this.lastText) {
+      ctx.fillStyle = '#e9e9e9';
+      ctx.font = '11px monospace';
+      var lines = this.lastText.split('\n').slice(0, 10);
+      for (var i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i].slice(0, 42), 8, 28 + i * 13);
+      }
+    }
+  };
+
+  function CenterCropNode() {
+    this.title = 'CenterCrop';
+    this.size = [260, 120];
+    this.addInput('image', 'image');
+    this.addOutput('image', 'image');
+    this.cellW = 7;
+    this.cellH = 15;
+    this.addWidget('number', 'cell width', this.cellW, function(v) { this.cellW = Math.max(1, Math.floor(v)); }.bind(this), {step: 1, min: 1});
+    this.addWidget('number', 'cell height', this.cellH, function(v) { this.cellH = Math.max(1, Math.floor(v)); }.bind(this), {step: 1, min: 1});
+  }
+  CenterCropNode.title = 'CenterCrop';
+  CenterCropNode.prototype.onExecute = function() {
+    var src = this.getInputData(0);
+    if (!(src instanceof HTMLCanvasElement)) {
+      this.setOutputData(0, null);
+      return;
+    }
+    var w = src.width;
+    var h = src.height;
+    var cw = Math.max(1, this.cellW | 0);
+    var ch = Math.max(1, this.cellH | 0);
+    var outW = Math.max(cw, Math.floor(w / cw) * cw);
+    var outH = Math.max(ch, Math.floor(h / ch) * ch);
+    var sx = Math.floor((w - outW) / 2);
+    var sy = Math.floor((h - outH) / 2);
+    var out = makeCanvas(outW, outH);
+    out.getContext('2d').drawImage(src, sx, sy, outW, outH, 0, 0, outW, outH);
+    this.setOutputData(0, out);
+  };
+
+  function TextNode() {
+    this.title = 'Text';
+    this.size = [300, 150];
+    this.addOutput('text', 'text');
+    this.text = '';
+    this.addWidget('text', 'value', this.text, function(v) { this.text = String(v || ''); }.bind(this));
+  }
+  TextNode.title = 'Text';
+  TextNode.prototype.onExecute = function() {
+    this.setOutputData(0, this.text);
+  };
+
+  function GreyscaleNode() {
+    this.title = 'Greyscale';
+    this.size = [190, 80];
+    this.addInput('rgb image', 'image');
+    this.addOutput('gray image', 'image');
+  }
+  GreyscaleNode.title = 'Greyscale';
+  GreyscaleNode.prototype.onExecute = function() {
+    var src = this.getInputData(0);
+    if (!(src instanceof HTMLCanvasElement)) {
+      this.setOutputData(0, null);
+      return;
+    }
+    this.setOutputData(0, toGreyscaleCanvas(src));
+  };
+
+  function ThresholdNode() {
+    this.title = 'Threshold';
+    this.size = [280, 120];
+    this.addInput('gray image', 'image');
+    this.addOutput('binary image', 'image');
+    this.threshold = 128;
+    this.addWidget('slider', 'threshold', this.threshold, function(v) {
+      this.threshold = Math.max(0, Math.min(255, Math.round(v)));
+    }.bind(this), {min: 0, max: 255, step: 1});
+  }
+  ThresholdNode.title = 'Threshold';
+  ThresholdNode.prototype.onExecute = function() {
+    var src = this.getInputData(0);
+    if (!(src instanceof HTMLCanvasElement)) {
+      this.setOutputData(0, null);
+      return;
+    }
+    if (src._mode && src._mode !== 'gray') {
+      this.setOutputData(0, null);
+      return;
+    }
+    this.setOutputData(0, toThresholdCanvas(src, this.threshold));
+  };
+
+  function CannyNode() {
+    this.title = 'Canny-Edge';
+    this.size = [280, 140];
+    this.addInput('image', 'image');
+    this.addOutput('edges', 'image');
+    this.low = 80;
+    this.high = 160;
+    this.addWidget('slider', 'low', this.low, function(v) {
+      this.low = Math.max(0, Math.min(255, Math.round(v)));
+    }.bind(this), {min: 0, max: 255, step: 1});
+    this.addWidget('slider', 'high', this.high, function(v) {
+      this.high = Math.max(0, Math.min(255, Math.round(v)));
+    }.bind(this), {min: 0, max: 255, step: 1});
+  }
+  CannyNode.title = 'Canny-Edge';
+  CannyNode.prototype.onExecute = function() {
+    var src = this.getInputData(0);
+    if (!(src instanceof HTMLCanvasElement)) {
+      this.setOutputData(0, null);
+      return;
+    }
+    var low = Math.min(this.low, this.high);
+    var high = Math.max(this.low, this.high);
+    this.setOutputData(0, runCanny(src, low, high));
+  };
+
+  LiteGraph.registerNodeType('ascii/image', ImageNode);
+  LiteGraph.registerNodeType('ascii/look', LookNode);
+  LiteGraph.registerNodeType('ascii/centercrop', CenterCropNode);
+  LiteGraph.registerNodeType('ascii/text', TextNode);
+  LiteGraph.registerNodeType('ascii/greyscale', GreyscaleNode);
+  LiteGraph.registerNodeType('ascii/threshold', ThresholdNode);
+  LiteGraph.registerNodeType('ascii/canny', CannyNode);
+
+  var graphCanvas = document.getElementById('node-canvas');
+  if (!graphCanvas) return;
+  var graph = new LGraph();
+  var canvas = new LGraphCanvas(graphCanvas, graph);
+  canvas.background_image = null;
+  graph.start();
+
+  function addNode(type, x, y) {
+    var node = LiteGraph.createNode(type);
+    if (!node) return null;
+    node.pos = [x || 120, y || 120];
+    graph.add(node);
+    return node;
+  }
+
+  function seedGraph() {
+    var img = addNode('ascii/image', 80, 120);
+    var crop = addNode('ascii/centercrop', 380, 120);
+    var gray = addNode('ascii/greyscale', 690, 120);
+    var thr = addNode('ascii/threshold', 930, 120);
+    var look = addNode('ascii/look', 1260, 120);
+    if (img && crop && gray && thr && look) {
+      img.connect(0, crop, 0);
+      crop.connect(0, gray, 0);
+      gray.connect(0, thr, 0);
+      thr.connect(0, look, 0);
+    }
+  }
+  seedGraph();
+
+  document.querySelectorAll('[data-add-node]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      addNode(btn.getAttribute('data-add-node'), 200 + Math.random() * 280, 160 + Math.random() * 260);
+    });
+  });
+
+  function firstImageNode() {
+    var nodes = graph._nodes || [];
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i] instanceof ImageNode) return nodes[i];
+    }
+    return null;
+  }
+
+  var wrap = document.getElementById('node-canvas-wrap');
+  wrap.addEventListener('dragover', function(e) { e.preventDefault(); });
+  wrap.addEventListener('drop', function(e) {
+    e.preventDefault();
+    if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files[0]) return;
+    var file = e.dataTransfer.files[0];
+    if (!file.type || file.type.indexOf('image/') !== 0) return;
+    var node = firstImageNode() || addNode('ascii/image', 120, 120);
+    node.loadFromFile(file);
+  });
+
+  (function loadOpenCV() {
+    var s = document.createElement('script');
+    s.src = 'https://docs.opencv.org/4.10.0/opencv.js';
+    s.async = true;
+    document.head.appendChild(s);
+  })();
 })();
 </script>
 </body>
